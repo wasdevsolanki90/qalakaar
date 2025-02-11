@@ -8,12 +8,11 @@ import { Product } from "@/lib/types";
 import Policy from "@/views/Policy";
 
 import localFont from 'next/font/local'
- 
+
 const myFont = localFont({
   src: "./fonts/00260-Regular.ttf",
   display: 'swap',
 })
-
 
 export const metadata = {
   title: "Qalaakar",

@@ -43,15 +43,15 @@ interface AboutUsaboutUs {
 
 export default async function AboutUs() {
   // Fetch aboutUs with revalidation (ISR)
-      const data = await client.fetch(query, undefined, {
-        next: { revalidate: 60 } // Revalidate every 60 seconds
-      });
-      const aboutUs: AboutUsaboutUs = data[0]; // Assuming there's only one policy document
-      // console.log(aboutUs);
-    
-      if (!aboutUs) {
-        return <div>No aboutUs found</div>;
-      }
+    const data = await client.fetch(query, undefined, {
+      next: { revalidate: 60 } // Revalidate every 60 seconds
+    });
+    const aboutUs: AboutUsaboutUs = data[0]; // Assuming there's only one policy document
+    // console.log(aboutUs);
+  
+    if (!aboutUs) {
+      return <div>No aboutUs found</div>;
+    }
   
   return (
     <section className="px-6 pt-36 pb-20 bg-[#f5f5f5] min-h-screen">

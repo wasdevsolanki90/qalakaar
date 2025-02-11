@@ -8,6 +8,7 @@ import { returnAndExchangePolicyPage } from "./returnAndExchangePolicyPage";
 import { contactUsPage } from "./contactUsPage";
 import { shippingPolicyPage } from "./shippingPolicyPage";
 import { privacyPolicyPage } from "./privacyPolicyPage";
+import { dashboard } from "./dashboard";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -19,6 +20,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
           returnAndExchangePolicyPage, 
           contactUsPage,
           shippingPolicyPage,
-          privacyPolicyPage
+          privacyPolicyPage,
+          userDashboardPage,
         ],
 };

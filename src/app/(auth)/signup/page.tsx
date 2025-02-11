@@ -162,7 +162,7 @@ export default function Signup() {
             placeholder="Phone number (e.g., 03xx-xxxxxxx)" 
             name="phone_no" 
             type="tel" 
-            pattern="\+\d{3}-\d{7}" 
+            // pattern="\+\d{3}-\d{7}"
             className="w-full" 
             title="Please enter a valid phone number in the format 03xx-xxxxxxx"
         />

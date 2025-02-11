@@ -61,6 +61,22 @@ const getProductTitle = async (product_id: string) => {
   }
 }
 
+export const GET = async () => {
+  try {
+    const user_id = cookies().get("user_id")?.value;
+    if (!user_id) {
+      return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
+
+    const orders = await db.select().from(orderTable).where(orderTable.user_id.eq(user_id));
+
+    return NextResponse.json({ orders });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+};
+
 export const POST = async (request: NextRequest) => {
   const body = await request.json();
   const uid = body.products[0].user_id;

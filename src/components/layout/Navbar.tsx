@@ -22,7 +22,7 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
 
   useEffect(() => {
     // Only enable scroll functionality on pages other than `/aboutUs` or `/shippingPolicy`
-    if (pathname !== "/aboutUs" && pathname !== "/shippingPolicy" && pathname !== "/returnPolicy" && pathname !== "/contactUs" && pathname !== "/privacyPolicy" && pathname !== "/terms") {
+    if (pathname !== "/aboutUs" && pathname !== "/shippingPolicy" && pathname !== "/returnPolicy" && pathname !== "/contactUs" && pathname !== "/privacyPolicy" && pathname !== "/terms" ) {
       const handleScroll = () => {
         setIsScrolled(window.scrollY > 0);
       };
@@ -52,6 +52,10 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
 
   const handleLinkClick = () => {
     setToggleNav(false); // Close the sidebar when a link is clicked
+  };
+
+  const handleDashboardLink = () => {
+    setDropDownOpen(false);
   };
 
   const handleLogout = async () => {
@@ -153,8 +157,6 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
             )}
           </div>
 
-          
-
           {/* Cart and Profile for Computer Screens */}
           <div className="hidden lg:flex lg:gap-5 lg:items-center">
             <Link href={"/Cart"} onClick={handleLinkClick}>
@@ -183,6 +185,13 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
                   <ul
                     className="absolute right-0 mt-2 w-24 bg-slate-50 text-xs sm:text-base font-normal rounded-md shadow-md py-2 border border-slate-200"
                   >
+                    <li className="py-1 px-2">
+                      <Link 
+                        onClick={handleDashboardLink}
+                        href={'/dashboard'}>
+                        Dashboard
+                      </Link>
+                    </li>
                     <li className="py-1 px-2">
                       <button onClick={handleLogout} type="button">
                         Logout
