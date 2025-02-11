@@ -21,6 +21,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
           contactUsPage,
           shippingPolicyPage,
           privacyPolicyPage,
-          userDashboardPage,
+          dashboard,
         ],
 };
