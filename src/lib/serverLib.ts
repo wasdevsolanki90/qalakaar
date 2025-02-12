@@ -2,8 +2,8 @@ import { SignJWT, jwtVerify } from "jose"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { UserT } from "@/lib/types"
-import { eq, and, sql } from "drizzle-orm";
-import { cartTable, db, userTable } from "@/lib/drizzle"; 
+import { eq, and, sql, inArray  } from "drizzle-orm";
+import { cartTable, db, userTable, orderTable, orderDetailsTable } from "@/lib/drizzle"; 
 import { bcryptCompare } from "./password";
 import { insert } from "sanity";
 
@@ -70,6 +70,7 @@ export async function login(formData: FormData) {
             name: userTable.first_name,
             email: userTable.email,
             password: userTable.password,
+            user_id: userTable.user_id,
         })
         .from(userTable)
         .where(eq(userTable.email, userEmail));
@@ -79,10 +80,11 @@ export async function login(formData: FormData) {
         // console.log(res[0].password, userPassword)
         const comparePassword:boolean = await bcryptCompare(userPassword, res[0].password)
         if (comparePassword) {
-            const user: {name:string, email: string, password: string} = {
+            const user: {name:string, email: string, password: string, user_id: number} = {
                 name: res[0].name,
                 email: userEmail,
-                password: userPassword
+                password: userPassword,
+                user_id: res[0].user_id,
             }
             // Create the session for the user
             const expires = new Date(Date.now() + 1 * 60 * 60 * 1000)
@@ -117,6 +119,41 @@ export async function login(formData: FormData) {
 export async function logout() {
     // Destroy the session
     cookies().set("session", "", { expires: new Date(0) })
+
+}
+
+export async function orders() {
+    try {
+            
+        const session = cookies().get("session")?.value
+        if (!session) {
+            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+        }
+
+        const getUser = await decrypt(session);
+
+        // const userOrders = await db.select()
+        //     .from(orderTable)
+        //     .where(eq(orderTable.user_id, getUser.user.user_id));
+
+        const userOrders = await db.select({
+                order: orderTable,
+                details: orderDetailsTable
+            })
+            .from(orderTable)
+            .leftJoin(
+                orderDetailsTable,
+                eq(orderTable.order_id, orderDetailsTable.order_id)
+            )
+            .where(eq(orderTable.user_id, getUser.user.user_id));
+
+        
+        return NextResponse.json(userOrders, { status: 200 });
+
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
 }
 
 export async function signup(formData: FormData) {
@@ -192,3 +229,4 @@ export async function updateSession(request: NextRequest, session:string) {
 
     return res
 }
+
