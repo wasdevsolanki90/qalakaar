@@ -1,7 +1,6 @@
 'use server'
 import { passwordHasher } from '@/lib/password';
-import { getSession, login, logout, signup, orders } from '@/lib/serverLib'
-import { NextResponse } from 'next/server';
+import { getSession, login, logout, signup } from '@/lib/serverLib';
  
 export async function signupUser(formData: FormData) {
     const password = formData.get("password")
@@ -30,20 +29,20 @@ export async function loginUser(formData: FormData) {
     }
 }
 
-export async function fetchOrders() {
-    try {
-        const res = await orders();
-        if (!res?.ok) {
-            return { success: false, message: "Failed to fetch orders" };
-        }
+// export async function fetchOrders() {
+//     try {
+//         const res = await orders();
+//         if (!res?.ok) {
+//             return { success: false, message: "Failed to fetch orders" };
+//         }
 
-        const userOrder = await res.json(); 
-        return { success: true, userOrder };
-    } catch (error) {
-        console.error("Error in fetchOrders:", error);
-        return { success: false, message: "An error occurred" };
-    }
-}
+//         const userOrder = await res.json(); 
+//         return { success: true, userOrder };
+//     } catch (error) {
+//         console.error("Error in fetchOrders:", error);
+//         return { success: false, message: "An error occurred" };
+//     }
+// }
 
 export async function logoutUser() {
     await logout()
@@ -54,7 +53,10 @@ export async function fetchSession() {
     if (!session) {
         return { name: "Login" }
     }
-    return { name: session.user.name, }
+    return { 
+        name: session.user.name, 
+        userId: session.user.user_id,
+    }
 }
 
 export async function createOrder(formData: FormData) {

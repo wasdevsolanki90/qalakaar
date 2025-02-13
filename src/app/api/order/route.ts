@@ -1,5 +1,7 @@
+import { SignJWT, jwtVerify } from "jose"
 import { NextRequest, NextResponse } from "next/server";
 import { db, orderTable, orderDetailsTable } from "@/lib/drizzle";
+import { eq, and, sql, inArray  } from "drizzle-orm";
 import { formatDateTime } from "@/lib/dateFormatter";
 import { cookies } from "next/headers";
 import nodemailer from "nodemailer";
@@ -7,9 +9,15 @@ import nodemailer from "nodemailer";
 import { Product as BaseProduct } from "@/lib/types";
 import { client } from "@/lib/sanityClient";
 
+import { fetchSession } from "@/app/actions";
+
+
 interface Product extends BaseProduct {
   product_name: string;
 }
+
+const secret = process.env.JWT_SECRET
+const key = new TextEncoder().encode(secret) 
 
 class OrderIdGenerator {
   private static readonly PREFIX = "qalaakar-";
@@ -34,7 +42,7 @@ class OrderIdGenerator {
     // Store the generated ID
     this.generatedIds.add(uniqueId);
 
-    return uniqueId;
+    return uniqueId; 
   }
 
   /**
@@ -51,6 +59,14 @@ class OrderIdGenerator {
   }
 }
 
+export async function decrypt(input: string): Promise<any> {
+  const { payload } = await jwtVerify(input, key, {
+      algorithms: ["HS256"],
+  })
+
+  return payload
+}
+
 const getProductTitle = async (product_id: string) => {
   try {
     const res = await client.fetch(`*[_type=="product" && _id == "${product_id}"] {title}`);
@@ -61,17 +77,46 @@ const getProductTitle = async (product_id: string) => {
   }
 }
 
+export const GET = async () => {
+  try {
+
+    const session = cookies().get("session")?.value
+    if (!session) {
+        return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
+    }
+    const getUser = await decrypt(session);
+
+    const userOrders = await db.select({
+        order: orderTable,
+        details: orderDetailsTable
+      })
+      .from(orderTable)
+      .leftJoin(
+        orderDetailsTable,
+        eq(orderTable.order_id, orderDetailsTable.order_id)
+      )
+      .where(eq(orderTable.user_id, getUser.user.user_id));
+
+    return NextResponse.json(userOrders, { status: 200 });
+
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+};
+
 export const POST = async (request: NextRequest) => {
+
+  const fetchUser = await fetchSession();
+  const userId = fetchUser.userId ? fetchUser.userId : null;
   const body = await request.json();
-  const uid = body.products[0].user_id;
+  const uid = userId ? userId : body.products[0].user_id;
   const orderIdGenerator = new OrderIdGenerator();
   const orderId = orderIdGenerator.generateOrderId()
   // console.log(orderId); // e.g., "qalaakar-Xy3P2z
 
   const shipping_method = "standard";
   const payment_method = "cod";
-
-  // console.log("Body: ", body);
 
   const { email, first_name, last_name, address, city, province, country, postal_code, phone_no, billing_address, address_bill, city_bill, province_bill, country_bill, postal_code_bill, phone_no_bill, instructions, order_subtotal, order_total, delivery_charges } = body;
 

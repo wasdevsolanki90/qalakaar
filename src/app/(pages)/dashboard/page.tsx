@@ -7,7 +7,7 @@ export default async function dashboard() {
   return (
     <section className="px-6 pt-36 pb-20 bg-[#f5f5f5] min-h-screen">
       <div className="max-w-4xl mx-auto px-6">
-        <h1 className="text-4xl text-center font-bold text-gray-800 mb-6">User Dashboard</h1>
+        <h1 className="text-2xl text-center font-bold text-gray-800 mb-6">Dashboard</h1>
         
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
           <Link href="/dashboard/orders" className="flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition">

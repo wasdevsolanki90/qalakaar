@@ -66,9 +66,9 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
     setRequireSize("");
     const myColor = requireColor;
     setRequireColor("");
+    const toastId = toast.loading("Adding to cart...");
+    
     try {
-
-      const toastId = toast.loading("Adding to cart...");
       const res = await fetch(process.env.NEXT_PUBLIC_SITE_URL + "api/cart", {
         method: "POST",
         body: JSON.stringify({
@@ -92,6 +92,9 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
       console.log("Error adding to cart:", error);
       setRequireSize("");
       setCheck(false);
+      toast.error("Error adding to cart!", {
+        id: toastId,
+      });
     }
   };
 

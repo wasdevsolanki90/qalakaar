@@ -10,12 +10,14 @@ import { logoutUser, fetchSession } from "@/app/actions";
 import toast from "react-hot-toast";
 import { User2Icon, ShoppingBag, MenuIcon, XIcon } from "lucide-react";
 import Strip from "./Strip";
+import { useRouter } from 'next/navigation';
 
 export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
+  const router = useRouter()
   const [toggleNav, setToggleNav] = useState(false); // make responsive navbar with hamburger menu
   const [dropDownOpen, setDropDownOpen] = useState(false); // make responsive navbar with hamburger menu
   const { name, setName } = useCart()
-  const { cartCount, setCartCount } = useCart();
+  const { cartCount, setCartCount, setUserId } = useCart();
   const pathname = usePathname();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -63,9 +65,11 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
     const toastId = toast.loading("Logging out...");
     await logoutUser()
     setName("Login")
+    setUserId(null)
     toast.success("Logged out", {
       id: toastId,
-  });
+    });
+    router.push('/login')
   };
 
   return (

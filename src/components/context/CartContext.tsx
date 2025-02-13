@@ -14,11 +14,13 @@ function useCart() {
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartCount, setCartCount] = useState(0);
   const [name, setName] = useState("Login");
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     async function userSession() {
       const response = await fetchSession();
       setName(response.name);
+      setUserId(response.userId);
     }
     userSession();
   }, []);
@@ -28,7 +30,9 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     cartCount,
     setCartCount,
     name,
-    setName
+    setName,
+    userId,
+    setUserId,
   };
   return (
     <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>

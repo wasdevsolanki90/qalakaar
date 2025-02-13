@@ -36,7 +36,7 @@ const getProductData = async (slug: string) => {
 
   if (data && data[0]) {
     const product = data[0];
-    console.log('Product: ', product); 
+    // console.log('Product: ', product); 
     // Ensure images array is valid and insert the main image at index 0
     product.images = Array.isArray(product.images)
       ? [product.image, ...product.images]

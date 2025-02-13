@@ -119,41 +119,7 @@ export async function login(formData: FormData) {
 export async function logout() {
     // Destroy the session
     cookies().set("session", "", { expires: new Date(0) })
-
-}
-
-export async function orders() {
-    try {
-            
-        const session = cookies().get("session")?.value
-        if (!session) {
-            return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
-        }
-
-        const getUser = await decrypt(session);
-
-        // const userOrders = await db.select()
-        //     .from(orderTable)
-        //     .where(eq(orderTable.user_id, getUser.user.user_id));
-
-        const userOrders = await db.select({
-                order: orderTable,
-                details: orderDetailsTable
-            })
-            .from(orderTable)
-            .leftJoin(
-                orderDetailsTable,
-                eq(orderTable.order_id, orderDetailsTable.order_id)
-            )
-            .where(eq(orderTable.user_id, getUser.user.user_id));
-
-        
-        return NextResponse.json(userOrders, { status: 200 });
-
-    } catch (error) {
-        console.error("Error fetching orders:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-    }
+    
 }
 
 export async function signup(formData: FormData) {

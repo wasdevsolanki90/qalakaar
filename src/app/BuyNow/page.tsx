@@ -16,7 +16,7 @@ export default function BuyNow() {
   const [subTotal, setSubTotal] = useState<number>(0);
   const router = useRouter();
   
-  const { setCartCount } = useCart();
+  const { name, setName, setCartCount, userId } = useCart();
   
   const [products, setProducts] = useState<Product[]>();
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function BuyNow() {
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
-        console.log(data);
+        // console.log(data);
       })
       .catch((error) => {
         console.log("Error fetching data:", error);
@@ -53,7 +53,7 @@ export default function BuyNow() {
     // Include product details
     const productsData = products?.map((product) => ({
       product_id: product.product_id,
-      user_id: product.user_id,
+      user_id: userId ? userId : product.user_id,
       quantity: product.quantity,
       size: product.size,
       color: product.color,
@@ -61,8 +61,8 @@ export default function BuyNow() {
 
     // Prepare the full data
     const requestData = {
-      ...formDataObj,   // Spread the rest of the form data
-      products: productsData,  // Add products to the data
+      ...formDataObj,  
+      products: productsData,  
       order_subtotal: subTotal,
       order_total: subTotal + shippingTotal,
       delivery_charges: shippingTotal,
@@ -103,10 +103,14 @@ export default function BuyNow() {
         {/* Left Section: Form */}
         <div className="flex-1 bg-white p-6 rounded-lg shadow-md">
           {/* Contact Section */}
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold mb-4">Contact</h2>
-            <Link href="/login" className="text-base text-gray-500 underline">Login</Link>
-          </div>
+
+          {name === 'Login' && (
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold mb-4">Contact</h2>
+              <Link href="/login" className="text-base text-gray-500 underline">Login</Link>
+            </div>
+          )}
+
           <form className="space-y-4" onSubmit={handleCheckout}>
             <div>
               <label htmlFor="contactEmail" className="block font-medium">Email</label>

@@ -63,6 +63,16 @@ export const product = defineType({
       type: "number",
     }),
     defineField({
+      name: "price_usd",
+      title: "Price (USD)",
+      type: "number",
+    }),
+    defineField({
+      name: "price_uae",
+      title: "Price (UAE)",
+      type: "number",
+    }),
+    defineField({
       name: "sizes",
       title: "Product Size",
       type: "array",
