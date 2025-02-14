@@ -59,13 +59,13 @@ class OrderIdGenerator {
   }
 }
 
-export async function decrypt(input: string): Promise<any> {
-  const { payload } = await jwtVerify(input, key, {
-      algorithms: ["HS256"],
-  })
+// export async function decrypt(input: string): Promise<any> {
+//   const { payload } = await jwtVerify(input, key, {
+//       algorithms: ["HS256"],
+//   })
 
-  return payload
-}
+//   return payload
+// }
 
 const getProductTitle = async (product_id: string) => {
   try {
