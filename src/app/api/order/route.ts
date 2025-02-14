@@ -84,7 +84,10 @@ export const GET = async () => {
     if (!session) {
         return NextResponse.json({ error: "User not authenticated" }, { status: 401 });
     }
-    const getUser = await decrypt(session);
+
+    const { payload } = await jwtVerify(session, key, {
+      algorithms: ["HS256"],
+    });
 
     const userOrders = await db.select({
         order: orderTable,
@@ -95,7 +98,7 @@ export const GET = async () => {
         orderDetailsTable,
         eq(orderTable.order_id, orderDetailsTable.order_id)
       )
-      .where(eq(orderTable.user_id, getUser.user.user_id));
+      .where(eq(orderTable.user_id, (payload as { user: { user_id: string } }).user.user_id));
 
     return NextResponse.json(userOrders, { status: 200 });
 
