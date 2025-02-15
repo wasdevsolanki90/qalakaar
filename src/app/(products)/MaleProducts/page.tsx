@@ -1,7 +1,7 @@
 import React from "react";
 import Product from "@/components/reusable/Product";
 import { client } from "@/lib/sanityClient";
-import { IProduct } from "@/lib/types";
+import { IProduct, getUserLocation, getPrice } from "@/lib/types";
 
 const query = `
 *[_type=="product" && category->name == 'Men' && !(_id in path("drafts.**"))] {
@@ -18,6 +18,8 @@ const query = `
 `;
 
 export default async function MaleProducts() {
+  const country = await getUserLocation();
+  
   // Fetch aboutUs with revalidation (ISR)
   const data = await client.fetch(query, undefined, {
     next: { revalidate: 60 } // Revalidate every 60 seconds
@@ -41,7 +43,7 @@ export default async function MaleProducts() {
                 key={product._id + index}
                 imgSrc={product.image}
                 productName={product.title}
-                productPrice={product.price}
+                productPrice={getPrice(product, country)}
                 productId={product._id}
                 slug={product.slug}
               />

@@ -25,7 +25,6 @@ export default async function AllProducts() {
 
   const country = await getUserLocation();
 
-
   // Fetch products from Sanity
   const products: IProduct[] = await client.fetch(query, undefined, {
     next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds

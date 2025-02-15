@@ -2,7 +2,7 @@ import React from "react";
 import { client } from "@/lib/sanityClient";
 import { urlForImage } from "../../sanity/lib/image";
 // import Product from "@/components/reusable/Product";
-import { IProduct } from "@/lib/types";
+import { IProduct, getUserLocation, getPrice } from "@/lib/types";
 // import { Carousel } from "@trendyol-js/react-carousel";
 import CarouselProducts from "@/components/reusable/CarouselProducts";
 
@@ -23,6 +23,8 @@ const getProductData = async () => {
 
 export default async function OurCollections() {
   const data: IProduct[] = await getProductData();
+  const country = await getUserLocation();
+  
   return (
     <section className="mb-14 px-6 py-0" id="products">
       <h1 className="capitalize text-2xl sm:text-3xl lg:text-4xl text-white text-left font-semibold mb-10">
@@ -37,7 +39,7 @@ export default async function OurCollections() {
                 key={product._id}
                 imgSrc={urlForImage(product.image).url()}
                 productName={product.title}
-                productPrice={product.price}
+                productPrice={getPrice(product, country)}
                 productId={product._id}
                 slug={product.slug}
               />
