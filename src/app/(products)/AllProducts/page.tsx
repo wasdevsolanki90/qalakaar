@@ -23,7 +23,7 @@ const query = `
 // **Main Server Component**
 export default async function AllProducts() {
 
-  const country = await getUserLocation();
+  const country = 'US';  
 
   // Fetch products from Sanity
   const products: IProduct[] = await client.fetch(query, undefined, {

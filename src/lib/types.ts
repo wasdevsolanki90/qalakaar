@@ -1,14 +1,14 @@
 import { Image as IImage } from "sanity";
 export interface IProduct {
-  price_uae: any;
-  price_usd: any;
+  price_uae: number;
+  price_usd: number;
   _id: string;
   title: string;
   about: string;
   frontDesign: string;
   backDesign: string;
   description: string[];
-  price: string;
+  price: number;
   image: IImage;
   alt: string;
   category: string;
@@ -33,6 +33,7 @@ export type Product = {
   quantity: number;
   size: string;
   color: string;
+
 };
 
 export type UserT = {
@@ -56,33 +57,13 @@ export const getUserLocation = async (): Promise<string | null> => {
   }
 };
 
-export function getPrice(product: IProduct, country: string | null): number {
-  const currencySymbol = getCurrency(country || "PKR"); // Default to PKR
-  let price: number;
-
+export function getPrice(product: IProduct, country: any): number {
   switch (country) {
     case 'US':
-      price = parseFloat(product.price_usd);
-      break;
+      return product.price_usd;
     case 'UAE':
-      price = parseFloat(product.price_uae);
-      break;
+      return product.price_uae;
     default:
-      price = parseFloat(product.price);
-      break;
-  }
-
-  return `${currencySymbol} ${price.toFixed(2)}`;
-}
-
-
-export function getCurrency(country: string | null): string {
-  switch (country) {
-    case 'US':
-      return '$';
-    case 'UAE':
-      return 'AED';
-    default:
-      return 'PKR';
+      return product.price;
   }
 }
