@@ -23,7 +23,7 @@ export interface IProduct {
   length: number[];
   chest: number[];
   sleeve: number[];
-  productPrice: any;
+  productPrice: string;
 }
 
 export type Product = {
@@ -56,14 +56,33 @@ export const getUserLocation = async (): Promise<string | null> => {
   }
 };
 
-// Function to determine the correct price (returns a number)
-export function getPrice(product: IProduct, country: string | null): string {
+export function getPrice(product: IProduct, country: string | null): number {
+  const currencySymbol = getCurrency(country || "PKR"); // Default to PKR
+  let price: number;
+
   switch (country) {
     case 'US':
-      return `$ ${product.price_usd}`;
+      price = parseFloat(product.price_usd);
+      break;
     case 'UAE':
-      return `Dirham ${product.price_uae}`;
+      price = parseFloat(product.price_uae);
+      break;
     default:
-      return `PKR ${product.price}`;
+      price = parseFloat(product.price);
+      break;
+  }
+
+  return `${currencySymbol} ${price.toFixed(2)}`;
+}
+
+
+export function getCurrency(country: string | null): string {
+  switch (country) {
+    case 'US':
+      return '$';
+    case 'UAE':
+      return 'AED';
+    default:
+      return 'PKR';
   }
 }
