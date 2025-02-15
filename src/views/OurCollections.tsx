@@ -23,7 +23,6 @@ const getProductData = async () => {
 
 export default async function OurCollections() {
   const data: IProduct[] = await getProductData();
-
   return (
     <section className="mb-14 px-6 py-0" id="products">
       <h1 className="capitalize text-2xl sm:text-3xl lg:text-4xl text-white text-left font-semibold mb-10">

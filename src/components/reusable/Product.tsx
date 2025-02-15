@@ -27,7 +27,7 @@ export default function Product({
           className="object-cover object-center h-[400px] w-full mb-2 transition-transform duration-300 ease-in-out transform group-hover:scale-105"
         />
         <h3 className="text-lg text-white font-semibold">{productName}</h3>
-        <p className="text-lg text-white font-bold">PKR {productPrice}</p>
+        <p className="text-lg text-white font-bold">{productPrice}</p>
       </div>
     </Link>
   );
