@@ -52,7 +52,7 @@ export const getUserLocation = async (): Promise<string | null> => {
     const res = await fetch("https://ipinfo.io/json", { cache: "no-store" });
     const data = await res.json();
 
-    return 'US'; // Returns country code like "US", "AE", "PK"
+    return data.country; // Returns country code like "US", "AE", "PK"
   } catch (error) {
     console.error("Error fetching location:", error);
     return null;
