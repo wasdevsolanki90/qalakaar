@@ -57,7 +57,7 @@ export const getUserLocation = async (): Promise<string | null> => {
     console.error("Error fetching location:", error);
     return null;
   }
-};
+}; 
 
 export function getPrice(product: IProduct, country: any): number {
   switch (country) {
