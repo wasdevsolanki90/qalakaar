@@ -26,8 +26,7 @@ export default function CarouselProducts({
           alt={"Image"}
           label={{
             title: productName,
-            amount: productPrice.toString(),
-            currencyCode: "$",
+            amount: productPrice,
           }}
           src={urlForImage(imgSrc).url()}
           fill

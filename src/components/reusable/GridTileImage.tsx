@@ -13,8 +13,7 @@ export function GridTileImage({
   alt?: string;  // Specify alt prop here
   label?: {
     title: string;
-    amount: string;
-    currencyCode: string;
+    amount: number;
     position?: "bottom" | "center";
   };
 } & React.ComponentProps<typeof Image>) {

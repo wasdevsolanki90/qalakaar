@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { IProduct } from "@/lib/types";
+import React, { useEffect, useState, useRef } from "react";
+import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 import Image from "next/image";
 import { urlForImage } from "../../../sanity/lib/image";
 import { Button } from "../ui/button";
@@ -22,6 +22,24 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
   const [isSizeChartOpen, setIsSizeChartOpen] = useState<boolean>(false); // state for collapsible size chart
   const [selectedImage, setSelectedImage] = useState<IImage>(product.image); // Main image state
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0); // Index of the main image
+  const [country, setCountry] = useState<string | null>(null);
+  const fetched = useRef(false); 
+
+  useEffect(() => {
+    if (fetched.current) return; // Avoid re-fetching
+    fetched.current = true;
+
+    const fetchCountry = async () => {
+      try {
+        const userCountry = await getUserLocation();
+        setCountry(userCountry);
+      } catch (error) {
+        console.error("Error fetching country:", error);
+      }
+    };
+
+    fetchCountry();
+  }, []);
 
   const handleNextImage = () => {
     if (product.images === null) return;
@@ -272,7 +290,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
         {/* Price */}
         <div className="flex items-center space-x-4 font-sans">
           <p className="text-white text-xl font-semibold">
-            PKR {product.price}
+            {getCurrencySymbol(country)} {getPrice(product, country)}
           </p>
         </div>
 

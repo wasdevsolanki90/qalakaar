@@ -1,7 +1,7 @@
 import React from "react";
 import Product from "@/components/reusable/Product";
 import { client } from "@/lib/sanityClient";
-import { IProduct, getUserLocation, getPrice } from "@/lib/types";
+import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 
 // Sanity query for fetching products
 const query = `
@@ -23,8 +23,8 @@ const query = `
 // **Main Server Component**
 export default async function AllProducts() {
 
-  const country = 'US';  
-
+  const country = await getUserLocation();
+  
   // Fetch products from Sanity
   const products: IProduct[] = await client.fetch(query, undefined, {
     next: { revalidate: 60 }, // ISR: Revalidate every 60 seconds
@@ -48,8 +48,9 @@ export default async function AllProducts() {
           <Product
             key={product._id + index}
             imgSrc={product.image}
-            productName={product.title}
+            Currency={getCurrencySymbol(country)}
             productPrice={getPrice(product, country)}
+            productName={product.title}
             productId={product._id}
             slug={product.slug}
           />

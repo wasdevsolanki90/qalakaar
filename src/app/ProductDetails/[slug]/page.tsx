@@ -6,6 +6,8 @@ import ProductDetailsComp from "@/components/reusable/ProductDetailsComp";
 const createQuery = (slug: string) => `
   *[_type=="product" && slug.current=="${slug}" && !(_id in path("drafts.**"))] {
     slug,
+    price_usd, 
+    price_uae,
     price, 
     _id,
     title,

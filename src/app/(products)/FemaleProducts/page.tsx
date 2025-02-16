@@ -1,12 +1,14 @@
 import React from "react";
 import Product from "@/components/reusable/Product";
 import { client } from "@/lib/sanityClient";
-import { IProduct, getUserLocation, getPrice  } from "@/lib/types";
+import { IProduct,  getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 
 const query = `
 *[_type=="product" && category->name == 'Women' && !(_id in path("drafts.**"))] {
     "slug":slug.current,
       price, 
+      price_usd, 
+      price_uae,
       _id,
       title,
       image,
@@ -42,6 +44,7 @@ export default async function FemaleProducts() {
                 key={product._id + index}
                 imgSrc={product.image}
                 productName={product.title}
+                Currency={getCurrencySymbol(country)}
                 productPrice={getPrice(product, country)}
                 productId={product._id}
                 slug={product.slug}
