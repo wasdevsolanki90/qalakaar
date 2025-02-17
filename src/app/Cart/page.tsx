@@ -1,22 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import CartItem from "@/components/reusable/CartItem";
 import { ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
-import { Product } from "@/lib/types";
+import { Product, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 import { useCart } from "@/components/context/CartContext";
 import Link from "next/link";
 
 export default function Cart() { 
   const { setCartCount } = useCart();
   const [subTotal, setSubTotal] = useState<number>(0);
+  const [subTotalDisplay, setSubTotalDisplay] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>();
   const [deleteCall, setDeleteCall] = useState(0);
   const [check, setCheck] = useState(false);
   const [deleteAll, setDeleteAll] = useState(false);
   const deliveryCharges = 0;
+
+  const [country, setCountry] = useState<string | null>(null);
+  const fetched = useRef(false); // Prevent double fetch in Strict Mode
 
   useEffect(() => {
     setProducts([]);
@@ -36,6 +40,22 @@ export default function Cart() {
         console.log("Error fetching data:", error);
       });
   }, [deleteCall]);
+
+  useEffect(() => {
+    if (fetched.current) return; // Avoid re-fetching
+    fetched.current = true;
+
+    const fetchCountry = async () => {
+      try {
+        const userCountry = await getUserLocation();
+        setCountry(userCountry);
+      } catch (error) {
+        console.error("Error fetching country:", error);
+      }
+    };
+
+    fetchCountry();
+  }, []);
 
   const handleDeleteCall = (a: number, price: number, quantity: number) => {
     setDeleteCall((prevSubTotal) => prevSubTotal + a);
@@ -123,7 +143,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white duration-700 ease-in-out">
-                          PKR {subTotal}
+                          {getCurrencySymbol(country)} {subTotal}
                         </div>
                       </div>
                     </li>
@@ -135,7 +155,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          PKR {deliveryCharges}
+                        {getCurrencySymbol(country)} {deliveryCharges}
                         </div>
                       </div>
                     </li>
@@ -147,7 +167,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          PKR 
+                          {getCurrencySymbol(country)} 
                           {(
                             subTotal +
                             deliveryCharges

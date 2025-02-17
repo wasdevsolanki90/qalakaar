@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { CalendarClock, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Trash2 } from "lucide-react";
 import { client } from "@/lib/sanityClient";
 import { urlForImage } from "../../../sanity/lib/image";
 import toast from "react-hot-toast";
-import { IProduct } from "@/lib/types";
+import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 import { useCart } from "@/components/context/CartContext";
 
 export default function CartItem(props: {
@@ -21,12 +21,16 @@ export default function CartItem(props: {
   const [product, setProduct] = useState<IProduct[]>();
   const [newQuantity, setNewQuantity] = useState(props.quantity);
   const [updating, setUpdating] = useState(false);
+  const [country, setCountry] = useState<string | null>(null);
+  const fetched = useRef(false);
 
   useEffect(() => {
     client
       .fetch(
         `*[_type=="product" && _id == "${props.product_id}"] {
       price, 
+      price_usd, 
+      price_uae,
       _id,
       title,
       type,
@@ -68,6 +72,22 @@ export default function CartItem(props: {
   //     );
   //   }
   // }, [product]);
+
+  useEffect(() => {
+    if (fetched.current) return; // Avoid re-fetching
+    fetched.current = true;
+
+    const fetchCountry = async () => {
+      try {
+        const userCountry = await getUserLocation();
+        setCountry(userCountry);
+      } catch (error) {
+        console.error("Error fetching country:", error);
+      }
+    };
+
+    fetchCountry();
+  }, []);
 
   const handleDelete = async (price: number) => {
     try {
@@ -162,7 +182,7 @@ export default function CartItem(props: {
                 {product[0].type}
               </p>
               <p className="text-base font-semibold">
-                Price: PKR {product[0].price}
+                Price: {getCurrencySymbol(country)} {getPrice(product[0], country)}
               </p>
             </div>
             <Button
@@ -174,7 +194,7 @@ export default function CartItem(props: {
           </div>
           <div className="text-white w-full grid grid-cols-1 lg:grid-cols-2 items-baseline justify-between">
             <p className="text-base font-semibold">
-              Item Total: PKR {product[0].price * newQuantity}
+              Item Total: {getCurrencySymbol(country)} {getPrice(product[0], country) * newQuantity}
             </p>
             <div className="order-1 md:order-last">
               <div className="flex items-baseline justify-between space-y-2">
@@ -182,7 +202,7 @@ export default function CartItem(props: {
                 <div className="flex-[2_1_0%] flex items-center justify-around">
                   <Button
                     onClick={() =>
-                      handleQuantityCount("decrement", product[0].price)
+                      handleQuantityCount("decrement", getPrice(product[0], country))
                     }
                     className="bg-gray-100 rounded-full text-gray-600 text-2xl shadow-lg hover:scale-105 duration-300"
                   >
@@ -191,7 +211,7 @@ export default function CartItem(props: {
                   <p>{newQuantity}</p>
                   <Button
                     onClick={() =>
-                      handleQuantityCount("increment", product[0].price)
+                      handleQuantityCount("increment", getPrice(product[0], country))
                     }
                     className="bg-gray-100 rounded-full text-gray-600 text-2xl shadow-lg hover:scale-105 duration-300"
                   >
