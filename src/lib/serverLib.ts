@@ -175,10 +175,90 @@ export async function signup(formData: FormData) {
     }
 }
 
+export async function updateProfile(formData: FormData) {
+    try {   
+        // Verify credentials and get the user
+        const firstName = formData.get("first_name")?.toString();
+        const lastName = formData.get("last_name")?.toString();
+        const userEmail = formData.get("email")?.toString();
+        const userPassword = formData.get("password")?.toString();
+        const address = formData.get("address")?.toString();
+        const city = formData.get("city")?.toString();
+        const country = formData.get("country")?.toString();
+        const postal_code = formData.get("postal_code")?.toString();
+        const phone_no = formData.get("phone_no")?.toString();
+
+        if (!firstName || !lastName || !userEmail) {
+            throw new Error("Missing credentials")
+        }
+        
+        const updateData: Record<string, string | undefined> = {
+            first_name: firstName,
+            last_name: lastName,
+            address,
+            city,
+            country,
+            postal_code,
+            phone_no,
+        };
+
+        if (userPassword) {
+            updateData.password = userPassword;
+        }
+
+        const res = await db
+            .update(userTable)
+            .set(updateData)
+            .where(eq(userTable.email, userEmail))
+            .returning();
+        
+        await updateCartTale(userEmail)
+
+        if (!res) {
+            throw new Error("User not found or update failed");
+        }
+
+        return NextResponse.json(updateData);
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error ("Update error:", error.message)
+            return NextResponse.json({ 
+                error: error.message },
+                { status: 409 }
+            );
+        }
+    }
+}
+
 export async function getSession() {
     const session = cookies().get("session")?.value
     if (!session) return null
     return await decrypt(session)
+}
+
+export async function getAuthUser() {
+    const session = cookies().get("session")?.value
+    if (!session) return null
+    const auth = await decrypt(session)
+
+    const user = await db
+        .select({
+            first_name: userTable.first_name,
+            last_name: userTable.last_name,
+            email: userTable.email,
+            password: userTable.password,
+            address: userTable.address,
+            city: userTable.city,
+            country: userTable.country,
+            postal_code: userTable.postal_code,
+            phone_no: userTable.phone_no,
+            user_id: userTable.user_id,
+        })
+        .from(userTable)
+        .where(eq(userTable.user_id, auth.user.user_id));
+
+    return user.length > 0 ? user[0] : null;
 }
 
 export async function updateSession(request: NextRequest, session:string) {

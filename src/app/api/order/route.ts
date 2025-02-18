@@ -99,7 +99,7 @@ export const GET = async () => {
         eq(orderTable.order_id, orderDetailsTable.order_id)
       )
       .where(eq(orderTable.user_id, (payload as { user: { user_id: string } }).user.user_id));
-
+      
     return NextResponse.json(userOrders, { status: 200 });
 
   } catch (error) {

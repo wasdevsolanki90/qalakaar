@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { client } from "@/lib/sanityClient";
+import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 
 interface OrderDetail {
   product_name: string;
   product_id: string;
   quantity: number;
-  price: number;
+  price?: number;
 }
 
 interface Order {
@@ -20,9 +22,14 @@ interface Order {
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [country, setCountry] = useState<string | null>(null);
+  const fetched = useRef(false);
 
   useEffect(() => {
     const handleOrder = async () => {
+      const country = await getUserLocation();
+      setCountry(country);
+
       try {
         
         const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/order`, {
@@ -43,8 +50,26 @@ export default function Orders() {
           payment_method: item.order.payment_method,
           order_details: Array.isArray(item.details) ? item.details : [item.details], 
         }));
+        // console.log('Result:', formattedOrders);
+        // setOrders(formattedOrders);
 
-        setOrders(formattedOrders);
+        // Fetch prices for each order detail
+        const ordersWithPrices = await Promise.all(
+          formattedOrders.map(async (order:any) => {
+            const detailsWithPrices = await Promise.all(
+              order.order_details.map(async (detail:any) => {
+                const product = await client.fetch(
+                  `*[_type=="product" && _id == "${detail.product_id}"][0]`
+                );
+                const price = getPrice(product, country);
+                return { ...detail, price };
+              })
+            );
+            return { ...order, order_details: detailsWithPrices };
+          })
+        );
+
+        setOrders(ordersWithPrices);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -52,13 +77,14 @@ export default function Orders() {
         setLoading(false);
       }
     };
-  
+
     handleOrder();
   }, []);
+
   
   return (
-    <section className="px-6 pt-36 pb-20 bg-[#f5f5f5] min-h-screen">
-      <h5 className="text-2xl text-center font-bold text-gray-800 mb-6">My Orders</h5>
+    <section className="px-6 pt-36 pb-20 bg-black min-h-screen">
+      <h5 className="text-2xl text-center font-bold text-white mb-6">My Orders</h5>
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="table-auto w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -104,7 +130,7 @@ export default function Orders() {
                       {detail.quantity}
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
-                      ${order.order_total ?? "N/A"}
+                      {getCurrencySymbol(country)} {detail.price ?? "N/A"}
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                       {new Date(order.order_date).toLocaleDateString()}

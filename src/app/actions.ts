@@ -1,13 +1,15 @@
 'use server'
 import { passwordHasher } from '@/lib/password';
-import { getSession, login, logout, signup } from '@/lib/serverLib';
+import { getSession, login, logout, signup, getAuthUser, updateProfile } from '@/lib/serverLib';
  
 export async function signupUser(formData: FormData) {
+
     const password = formData.get("password")
     if (typeof password === 'string') {
         const hashedPassword = await passwordHasher(password);
         formData.set("password", hashedPassword); 
-    } 
+    }
+
 
     const res = await signup(formData)
     const result = await res?.json()
@@ -16,6 +18,23 @@ export async function signupUser(formData: FormData) {
         return { success: true, message: "Signup successful"  }
     } else {
         return { success: false, message: result.error }
+    }
+}
+
+export async function updateAuthUser(formData: FormData) {
+    const password = formData.get("password");
+    if (password && typeof password === 'string') {
+        const hashedPassword = await passwordHasher(password);
+        formData.set("password", hashedPassword);
+    }
+
+    const res = await updateProfile(formData);
+    const result = await res?.json();
+
+    if (res?.ok) {
+        return { success: true, message: "Update successful", result: result };
+    } else {
+        return { success: false, message: result?.error || "Update failed" };
     }
 }
 
@@ -57,6 +76,16 @@ export async function fetchSession() {
         name: session.user.name, 
         userId: session.user.user_id,
     }
+}
+
+export async function fetchAuthUser() {
+    const session = await getAuthUser();
+    if (!session) {
+        return { name: "Login" }
+    }
+
+
+    return session;
 }
 
 export async function createOrder(formData: FormData) {

@@ -12,7 +12,6 @@ import Link from "next/link";
 export default function Cart() { 
   const { setCartCount } = useCart();
   const [subTotal, setSubTotal] = useState<number>(0);
-  const [subTotalDisplay, setSubTotalDisplay] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>();
   const [deleteCall, setDeleteCall] = useState(0);
   const [check, setCheck] = useState(false);
@@ -20,7 +19,7 @@ export default function Cart() {
   const deliveryCharges = 0;
 
   const [country, setCountry] = useState<string | null>(null);
-  const fetched = useRef(false); // Prevent double fetch in Strict Mode
+  const fetched = useRef(false); // Prevent double fetch in Strict Mode  
 
   useEffect(() => {
     setProducts([]);
@@ -34,7 +33,6 @@ export default function Cart() {
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
-        // console.log(data);
       })
       .catch((error) => {
         console.log("Error fetching data:", error);
@@ -167,8 +165,8 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          {getCurrencySymbol(country)} 
-                          {(
+                          {getCurrencySymbol(country)} &nbsp;
+                           {(
                             subTotal +
                             deliveryCharges
                           )}

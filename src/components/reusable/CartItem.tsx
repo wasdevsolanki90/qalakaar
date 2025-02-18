@@ -17,12 +17,28 @@ export default function CartItem(props: {
   updateDeleteCall: (a: number, price: number, quantity: number) => void; // Callback function
   setSubTotalPrice: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const { setCartCount } = useCart();
+  const { setCartCount } = useCart(); 
   const [product, setProduct] = useState<IProduct[]>();
   const [newQuantity, setNewQuantity] = useState(props.quantity);
   const [updating, setUpdating] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
   const fetched = useRef(false);
+
+  useEffect(() => {
+    if (fetched.current) return; // Avoid re-fetching
+    fetched.current = true;
+
+    const fetchCountry = async () => {
+      try {
+        const userCountry = await getUserLocation();
+        setCountry(userCountry);
+      } catch (error) {
+        console.error("Error fetching country:", error);
+      }
+    };
+
+    fetchCountry();
+  }, []);
 
   useEffect(() => {
     client
@@ -51,8 +67,7 @@ export default function CartItem(props: {
         // console.log(data);
         if (data) {
           props.setSubTotalPrice((prevTotal: number) => {
-            // console.log("prev ", prevTotal);
-            return data[0].price * props.quantity + prevTotal;
+            return getPrice(data[0], country) * props.quantity + prevTotal;
           });
         }
       })
@@ -73,22 +88,6 @@ export default function CartItem(props: {
   //   }
   // }, [product]);
 
-  useEffect(() => {
-    if (fetched.current) return; // Avoid re-fetching
-    fetched.current = true;
-
-    const fetchCountry = async () => {
-      try {
-        const userCountry = await getUserLocation();
-        setCountry(userCountry);
-      } catch (error) {
-        console.error("Error fetching country:", error);
-      }
-    };
-
-    fetchCountry();
-  }, []);
-
   const handleDelete = async (price: number) => {
     try {
       const toastId = toast.loading("Deleting from cart...");
@@ -103,7 +102,6 @@ export default function CartItem(props: {
       )
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           props.updateDeleteCall(1, price, newQuantity);
           toast.success("Product has been deleted from cart", {
             id: toastId,

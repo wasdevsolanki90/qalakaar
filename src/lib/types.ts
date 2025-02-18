@@ -49,7 +49,7 @@ export type UserT = {
 // Function to fetch user's location
 export const getUserLocation = async (): Promise<string | null> => {
   try {
-    const res = await fetch("http://ip-api.com/json", { cache: "no-store" });
+    const res = await fetch("http://ip-api.com/json/83.110.250.231", { cache: "no-store" });
     const data = await res.json();
 
     return data.countryCode; // Returns country code like "US", "AE", "PK"
