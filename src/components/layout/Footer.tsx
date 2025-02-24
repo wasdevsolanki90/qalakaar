@@ -53,7 +53,7 @@ export default async function Footer() {
             </Link>
             <Link
               target="_blank"
-              href="https://wa.me/03462326463 "
+              href="https://wa.me/923462326463 "
             >
               <div className="p-2 mr-4 rounded-xl bg-black text-white hover:scale-105 duration-200">
               <svg

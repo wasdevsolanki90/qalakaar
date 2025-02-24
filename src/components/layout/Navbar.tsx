@@ -142,7 +142,7 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
               </Link>
             ) : (
               <div className="relative">
-                <div className="flex gap-x-1 items-center cursor-pointer" onClick={()=>setDropDownOpen(false)}>
+                <div className="flex gap-x-1 items-center cursor-pointer" onClick={()=>setDropDownOpen(true)}>
                   <p className="text-white text-lg font-semibold">{name}</p>
                   <ChevronDown className="w-4 h-4 mt-1 text-white" />
                 </div>

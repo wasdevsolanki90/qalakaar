@@ -289,7 +289,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
 
         {/* Price */}
         <div className="flex items-center space-x-4 font-sans">
-          <p className="text-white text-xl font-semibold">
+          <p className="text-white text-4xl font-semibold">
             {getCurrencySymbol(country)} {getPrice(product, country)}
           </p>
         </div>
