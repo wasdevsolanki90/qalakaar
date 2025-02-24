@@ -1,8 +1,10 @@
-import React from 'react';
+"use client";
+
+import React from "react";
 import Link from "next/link";
 import { User2Icon, ShoppingBag, } from "lucide-react";
 
-export default async function dashboard() {
+export default function dashboard() {
   
   return (
     <section className="px-6 pt-36 pb-20 bg-black min-h-screen">

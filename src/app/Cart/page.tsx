@@ -9,7 +9,7 @@ import { Product, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/typ
 import { useCart } from "@/components/context/CartContext";
 import Link from "next/link";
 
-export default function Cart() { 
+export default function Cart() {
   const { setCartCount } = useCart();
   const [subTotal, setSubTotal] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>();
@@ -141,7 +141,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white duration-700 ease-in-out">
-                          {getCurrencySymbol(country)} {subTotal}
+                          {getCurrencySymbol(country)}{subTotal.toFixed(2)}
                         </div>
                       </div>
                     </li>
@@ -165,11 +165,8 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          {getCurrencySymbol(country)} &nbsp;
-                           {(
-                            subTotal +
-                            deliveryCharges
-                          )}
+                          {getCurrencySymbol(country)} 
+                          {(Number(subTotal || 0) + Number(deliveryCharges || 0)).toFixed(2)}
                         </div>
                       </div>
                     </li>

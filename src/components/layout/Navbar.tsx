@@ -151,6 +151,13 @@ export default function Navbar({ cartItemsCount }: { cartItemsCount: number }) {
                     className="absolute right-0 mt-2 w-24 bg-slate-50 text-xs sm:text-base font-normal rounded-md shadow-md py-2 border border-slate-200"
                   >
                     <li className="py-1 px-2">
+                      <Link 
+                        onClick={handleDashboardLink}
+                        href={'/dashboard'}>
+                        Dashboard
+                      </Link>
+                    </li> 
+                    <li className="py-1 px-2">
                       <button onClick={handleLogout} type="button">
                         Logout
                       </button>

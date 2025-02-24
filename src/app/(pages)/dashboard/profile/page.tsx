@@ -40,6 +40,7 @@ export default function Profile() {
   // Fetch user data on component mount
   useEffect(() => {
     const getUser = async () => {
+
       try {
         const authUser: any = await fetchAuthUser();
         if (authUser) {

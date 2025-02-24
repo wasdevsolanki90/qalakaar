@@ -103,13 +103,13 @@ export default function Orders() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-600">
+                <td colSpan={7} className="text-center py-4 text-white">
                   Loading...
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-4 text-gray-600">
+                <td colSpan={7} className="text-center py-4 text-white">
                   No orders found
                 </td>
               </tr>

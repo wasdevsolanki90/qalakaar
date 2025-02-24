@@ -25,7 +25,8 @@ export default function CartItem(props: {
   const fetched = useRef(false);
 
   useEffect(() => {
-    if (fetched.current) return; // Avoid re-fetching
+    // Avoid re-fetching
+    if (fetched.current) return; 
     fetched.current = true;
 
     const fetchCountry = async () => {
@@ -36,11 +37,14 @@ export default function CartItem(props: {
         console.error("Error fetching country:", error);
       }
     };
+    
 
     fetchCountry();
   }, []);
 
   useEffect(() => {
+    if (!country) return;
+
     client
       .fetch(
         `*[_type=="product" && _id == "${props.product_id}"] {
@@ -64,17 +68,22 @@ export default function CartItem(props: {
       })
       .then((data) => {
         setProduct(data);
-        // console.log(data);
         if (data) {
           props.setSubTotalPrice((prevTotal: number) => {
-            return getPrice(data[0], country) * props.quantity + prevTotal;
+            if(country == 'US') {
+              return data[0].price_usd * props.quantity + prevTotal;
+            } else if( country == 'AE') {
+              return data[0].price_uae * props.quantity + prevTotal;
+            } else {
+              return data[0].price * props.quantity + prevTotal;
+            }
           });
         }
       })
       .catch((error) => {
         console.log("Error fetching data:", error);
       });
-  }, []);
+  }, [country]);
 
   // useEffect(() => {
   //   if (product) {
@@ -122,6 +131,7 @@ export default function CartItem(props: {
       setNewQuantity(newQuantity + 1);
       props.setSubTotalPrice((prevTotal: number) => prevTotal + price);
     } else if (action === "decrement" && newQuantity !== 1) {
+      console.log('price - :', price);
       setNewQuantity(newQuantity - 1);
       props.setSubTotalPrice((prevTotal: number) => prevTotal - price);
     }
@@ -180,7 +190,7 @@ export default function CartItem(props: {
                 {product[0].type}
               </p>
               <p className="text-base font-semibold">
-                Price: {getCurrencySymbol(country)} {getPrice(product[0], country)}
+                Price: {getCurrencySymbol(country)}{getPrice(product[0], country)}
               </p>
             </div>
             <Button
@@ -192,7 +202,7 @@ export default function CartItem(props: {
           </div>
           <div className="text-white w-full grid grid-cols-1 lg:grid-cols-2 items-baseline justify-between">
             <p className="text-base font-semibold">
-              Item Total: {getCurrencySymbol(country)} {getPrice(product[0], country) * newQuantity}
+              Item Total: {getCurrencySymbol(country)}{getPrice(product[0], country) * newQuantity}
             </p>
             <div className="order-1 md:order-last">
               <div className="flex items-baseline justify-between space-y-2">
