@@ -11,6 +11,7 @@ export default function Hero() {
           autoPlay
           loop
           muted
+          controls={false}
         >
           Your browser does not support the video tag.
         </video>
