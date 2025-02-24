@@ -49,10 +49,12 @@ export type UserT = {
 // Function to fetch user's location
 export const getUserLocation = async (): Promise<string | null> => {
   try {
-    const res = await fetch("http://ip-api.com/json/", { cache: "no-store" });
+    // const res = await fetch("https://ipinfo.io/json?token=bd0812f343aac7", { cache: "no-store" });
+    const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a&ip=83.110.250.231", { cache: "no-store" });
     const data = await res.json();
 
-    return data.countryCode; // Returns country code like "US", "AE", "PK"
+    // Returns country code like "US", "AE", "PK"
+    return data.country_code2; 
   } catch (error) {
     console.error("Error fetching location:", error);
     return null;
