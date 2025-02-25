@@ -84,7 +84,6 @@ export async function fetchAuthUser() {
         return { name: "Login" }
     }
 
-
     return session;
 }
 

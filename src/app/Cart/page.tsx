@@ -109,7 +109,7 @@ export default function Cart() {
           <div className="flex flex-col xl:flex-row xl:justify-around xl:items-start mt-10 gap-y-4 gap-x-10">
             <div className="flex-[2_1_0%]">
               {products.map((product, index) => (
-                <CartItem
+                <CartItem 
                   key={product.product_id + index}
                   product_id={product.product_id}
                   quantity={product.quantity}

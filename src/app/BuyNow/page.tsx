@@ -1,12 +1,13 @@
 "use client";
 
 import { Product } from "@/lib/types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ProductCard from "./ProductCard";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation';
 import { useCart } from "@/components/context/CartContext";
+import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 
 export default function BuyNow() {
   const cities:string[] = [ "Islamabad", "Ahmed Nager", "Ahmadpur East", "Ali Khan", "Alipur", "Arifwala", "Attock", "Bhera", "Bhalwal", "Bahawalnagar", "Bahawalpur", "Bhakkar", "Burewala", "Chillianwala", "Chakwal", "Chichawatni", "Chiniot", "Chishtian", "Daska", "Darya Khan", "Dera Ghazi", "Dhaular", "Dina", "Dinga", "Dipalpur", "Faisalabad", "Fateh Jhang", "Ghakhar Mandi", "Gojra", "Gujranwala", "Gujrat", "Gujar Khan", "Hafizabad", "Haroonabad", "Hasilpur", "Haveli", "Lakha", "Jalalpur", "Jattan", "Jampur", "Jaranwala", "Jhang", "Jhelum", "Kalabagh", "Karor Lal", "Kasur", "Kamalia", "Kamoke", "Khanewal", "Khanpur", "Kharian", "Khushab", "Kot Adu", "Jauharabad", "Lahore", "Lalamusa", "Layyah", "Liaquat Pur", "Lodhran", "Malakwal", "Mamoori", "Mailsi", "Mandi Bahauddin", "mian Channu", "Mianwali", "Multan", "Murree", "Muridke", "Mianwali Bangla", "Muzaffargarh", "Narowal", "Okara", "Renala Khurd", "Pakpattan", "Pattoki", "Pir Mahal", "Qaimpur", "Qila Didar", "Rabwah", "Raiwind", "Rajanpur", "Rahim Yar", "Rawalpindi", "Sadiqabad", "Safdarabad", "Sahiwal", "Sangla Hill", "Sarai Alamgir", "Sargodha", "Shakargarh", "Sheikhupura", "Sialkot", "Sohawa", "Soianwala", "Siranwali", "Talagang", "Taxila", "Toba Tek", "Vehari", "Wah Cantonment", "Wazirabad", "Badin", "Bhirkan", "Rajo Khanani", "Chak", "Dadu", "Digri", "Diplo", "Dokri", "Ghotki", "Haala", "Hyderabad", "Islamkot", "Jacobabad", "Jamshoro", "Jungshahi", "Kandhkot", "Kandiaro", "Karachi", "Kashmore", "Keti Bandar", "Khairpur", "Kotri", "Larkana", "Matiari", "Mehar", "Mirpur Khas", "Mithani", "Mithi", "Mehrabpur", "Moro", "Nagarparkar", "Naudero", "Naushahro Feroze", "Naushara", "Nawabshah", "Nazimabad", "Qambar", "Qasimabad", "Ranipur", "Ratodero", "Rohri", "Sakrand", "Sanghar", "Shahbandar", "Shahdadkot", "Shahdadpur", "Shahpur Chakar", "Shikarpaur", "Sukkur", "Tangwani", "Tando Adam", "Tando Allahyar", "Tando Muhammad", "Thatta", "Umerkot", "Warah", "Abbottabad", "Adezai", "Alpuri", "Akora Khattak", "Ayubia", "Banda Daud", "Bannu", "Batkhela", "Battagram", "Birote", "Chakdara", "Charsadda", "Chitral", "Daggar", "Dargai", "Darya Khan", "dera Ismail", "Doaba", "Dir", "Drosh", "Hangu", "Haripur", "Karak", "Kohat", "Kulachi", "Lakki Marwat", "Latamber", "Madyan", "Mansehra", "Mardan", "Mastuj", "Mingora", "Nowshera", "Paharpur", "Pabbi", "Peshawar", "Saidu Sharif", "Shorkot", "Shewa Adda", "Swabi", "Swat", "Tangi", "Tank", "Thall", "Timergara", "Tordher", "Awaran", "Barkhan", "Chagai", "Dera Bugti", "Gwadar", "Harnai", "Jafarabad", "Jhal Magsi", "Kacchi", "Kalat", "Kech", "Kharan", "Khuzdar", "Killa Abdullah", "Killa Saifullah", "Kohlu", "Lasbela", "Lehri", "Loralai", "Mastung", "Musakhel", "Nasirabad", "Nushki", "Panjgur", "Pishin valley", "Quetta", "Sherani", "Sibi", "Sohbatpur", "Washuk", "Zhob", "Ziarat" ]
@@ -15,10 +16,29 @@ export default function BuyNow() {
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [subTotal, setSubTotal] = useState<number>(0);
   const router = useRouter();
+
+  const [country, setCountry] = useState<string | null>(null);
+  const fetched = useRef(false); // Prevent double fetch in Strict Mode  
   
   const { name, setName, setCartCount, userId } = useCart();
-  
   const [products, setProducts] = useState<Product[]>();
+  
+  useEffect(() => {
+    if (fetched.current) return; // Avoid re-fetching
+    fetched.current = true;
+
+    const fetchCountry = async () => {
+      try {
+        const userCountry = await getUserLocation();
+        setCountry(userCountry);
+      } catch (error) {
+        console.error("Error fetching country:", error);
+      }
+    };
+
+    fetchCountry();
+  }, []);
+
   useEffect(() => {
     setProducts([]);
     fetch(process.env.NEXT_PUBLIC_SITE_URL + "api/cart", {
@@ -30,7 +50,6 @@ export default function BuyNow() {
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
-        // console.log(data);
       })
       .catch((error) => {
         console.log("Error fetching data:", error);
@@ -395,13 +414,12 @@ export default function BuyNow() {
                     ))}
                 </div>
                 <div className="mt-4">
-                <p>Subtotal: PKR {subTotal}</p>
-                <p>Shipping: PKR {shippingTotal}</p>
-                <p>Total: PKR {subTotal + shippingTotal}</p>
+                <p>Subtotal: {getCurrencySymbol(country)}{subTotal.toFixed(2)}</p>
+                <p>Shipping: {getCurrencySymbol(country)}{shippingTotal.toFixed(2)}</p>
+                <p>Total: {getCurrencySymbol(country)}{(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
                 </div>
             </div>
       </div>
     </section>
   );
 };
-
