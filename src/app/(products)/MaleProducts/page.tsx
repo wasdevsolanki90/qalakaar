@@ -26,6 +26,7 @@ export default async function MaleProducts() {
   const data = await client.fetch(query, undefined, {
     next: { revalidate: 60 } // Revalidate every 60 seconds
   });
+
   const products: IProduct[] = data; // Assuming there's only one policy document
   // console.log(aboutUs);
 

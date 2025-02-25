@@ -54,7 +54,7 @@ export const getUserLocation = async (): Promise<string | null> => {
     const data = await res.json();
 
     // Returns country code like "US", "AE", "PK"
-    console.log('current country code:', data.country_code2);
+    // console.log('current country code:', data.country_code2);
     return data.country_code2; 
   } catch (error) {
     console.error("Error fetching location:", error);
