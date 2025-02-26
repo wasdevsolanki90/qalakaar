@@ -24,6 +24,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0); // Index of the main image
   const [country, setCountry] = useState<string | null>(null);
   const fetched = useRef(false); 
+  const [price, setPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (fetched.current) return; // Avoid re-fetching
@@ -146,7 +147,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
           </button>
         </div>
 
-        {product.images &&
+        {product.images && 
           <div className="grid grid-cols-4 gap-2 mt-4 w-full">
             {product.images.length > 0 && product.images.map((image, index) => (
               <Image

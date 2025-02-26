@@ -7,6 +7,8 @@ const getProductData = async () => {
     const res = await client.fetch(`*[_type=="product" && is_featured == true && !(_id in path("drafts.**"))] {
       "slug":slug.current,
         price, 
+        price_usd,
+        price_uae,
         _id,
         title,
         type,
