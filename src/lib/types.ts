@@ -64,22 +64,22 @@ export const getUserLocation = async (): Promise<string | null> => {
 
 export function getPrice(product: IProduct, country: any): number {
   switch (country) {
-    case 'US':
-      return product.price_usd;
+    case 'PK':
+      return product.price;
     case 'AE':
       return product.price_uae;
     default:
-      return product.price;
+      return product.price_usd;
   }
 }
 
 export function getCurrencySymbol(country: string | null): string {
   switch (country) {
-    case 'US':
-      return '$';  // US Dollar
+    case 'PK':
+      return 'PKR';  // US Dollar
     case 'AE':
       return 'AED'; // UAE Dirham
     default:
-      return 'PKR'; // Pakistani Rupee
+      return '$'; // Pakistani Rupee
   }
 }

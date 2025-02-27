@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation';
 import { useCart } from "@/components/context/CartContext";
 import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
+import { GetCountries, GetState, GetCity } from "react-country-state-city";
 
 export default function BuyNow() {
   const cities:string[] = [ "Islamabad", "Ahmed Nager", "Ahmadpur East", "Ali Khan", "Alipur", "Arifwala", "Attock", "Bhera", "Bhalwal", "Bahawalnagar", "Bahawalpur", "Bhakkar", "Burewala", "Chillianwala", "Chakwal", "Chichawatni", "Chiniot", "Chishtian", "Daska", "Darya Khan", "Dera Ghazi", "Dhaular", "Dina", "Dinga", "Dipalpur", "Faisalabad", "Fateh Jhang", "Ghakhar Mandi", "Gojra", "Gujranwala", "Gujrat", "Gujar Khan", "Hafizabad", "Haroonabad", "Hasilpur", "Haveli", "Lakha", "Jalalpur", "Jattan", "Jampur", "Jaranwala", "Jhang", "Jhelum", "Kalabagh", "Karor Lal", "Kasur", "Kamalia", "Kamoke", "Khanewal", "Khanpur", "Kharian", "Khushab", "Kot Adu", "Jauharabad", "Lahore", "Lalamusa", "Layyah", "Liaquat Pur", "Lodhran", "Malakwal", "Mamoori", "Mailsi", "Mandi Bahauddin", "mian Channu", "Mianwali", "Multan", "Murree", "Muridke", "Mianwali Bangla", "Muzaffargarh", "Narowal", "Okara", "Renala Khurd", "Pakpattan", "Pattoki", "Pir Mahal", "Qaimpur", "Qila Didar", "Rabwah", "Raiwind", "Rajanpur", "Rahim Yar", "Rawalpindi", "Sadiqabad", "Safdarabad", "Sahiwal", "Sangla Hill", "Sarai Alamgir", "Sargodha", "Shakargarh", "Sheikhupura", "Sialkot", "Sohawa", "Soianwala", "Siranwali", "Talagang", "Taxila", "Toba Tek", "Vehari", "Wah Cantonment", "Wazirabad", "Badin", "Bhirkan", "Rajo Khanani", "Chak", "Dadu", "Digri", "Diplo", "Dokri", "Ghotki", "Haala", "Hyderabad", "Islamkot", "Jacobabad", "Jamshoro", "Jungshahi", "Kandhkot", "Kandiaro", "Karachi", "Kashmore", "Keti Bandar", "Khairpur", "Kotri", "Larkana", "Matiari", "Mehar", "Mirpur Khas", "Mithani", "Mithi", "Mehrabpur", "Moro", "Nagarparkar", "Naudero", "Naushahro Feroze", "Naushara", "Nawabshah", "Nazimabad", "Qambar", "Qasimabad", "Ranipur", "Ratodero", "Rohri", "Sakrand", "Sanghar", "Shahbandar", "Shahdadkot", "Shahdadpur", "Shahpur Chakar", "Shikarpaur", "Sukkur", "Tangwani", "Tando Adam", "Tando Allahyar", "Tando Muhammad", "Thatta", "Umerkot", "Warah", "Abbottabad", "Adezai", "Alpuri", "Akora Khattak", "Ayubia", "Banda Daud", "Bannu", "Batkhela", "Battagram", "Birote", "Chakdara", "Charsadda", "Chitral", "Daggar", "Dargai", "Darya Khan", "dera Ismail", "Doaba", "Dir", "Drosh", "Hangu", "Haripur", "Karak", "Kohat", "Kulachi", "Lakki Marwat", "Latamber", "Madyan", "Mansehra", "Mardan", "Mastuj", "Mingora", "Nowshera", "Paharpur", "Pabbi", "Peshawar", "Saidu Sharif", "Shorkot", "Shewa Adda", "Swabi", "Swat", "Tangi", "Tank", "Thall", "Timergara", "Tordher", "Awaran", "Barkhan", "Chagai", "Dera Bugti", "Gwadar", "Harnai", "Jafarabad", "Jhal Magsi", "Kacchi", "Kalat", "Kech", "Kharan", "Khuzdar", "Killa Abdullah", "Killa Saifullah", "Kohlu", "Lasbela", "Lehri", "Loralai", "Mastung", "Musakhel", "Nasirabad", "Nushki", "Panjgur", "Pishin valley", "Quetta", "Sherani", "Sibi", "Sohbatpur", "Washuk", "Zhob", "Ziarat" ]
@@ -17,12 +18,92 @@ export default function BuyNow() {
   const [subTotal, setSubTotal] = useState<number>(0);
   const router = useRouter();
 
-  const [country, setCountry] = useState<string | null>(null);
+  const [locatiom, setLocation] = useState<string | null>(null);
   const fetched = useRef(false); // Prevent double fetch in Strict Mode  
   
   const { name, setName, setCartCount, userId } = useCart();
   const [products, setProducts] = useState<Product[]>();
   
+  const [country, setCountry] = useState<number | undefined>();
+  const [currentState, setcurrentState] = useState<number>();
+  const [city, setCity] = useState<number>();
+  const [countriesList, setCountriesList] = useState<any[]>([]);
+  const [stateList, setStateList] = useState<any[]>([]);
+  const [citiesList, setCitiesList] = useState<any[]>([]);
+  
+  // Billing information
+  const [countryBill, setCountryBill] = useState<number | undefined>();
+  const [currentStateBill, setcurrentStateBill] = useState<number>();
+  const [cityBill, setCityBill] = useState<number>();
+
+  const [stateListBill, setStateListBill] = useState<any[]>([]);
+  const [citiesListBill, setCitiesListBill] = useState<any[]>([]);
+
+  // useEffect(() => {
+  //   GetCountries().then((result) => {
+  //       setCountriesList(result);
+  //   });
+  // }, []);
+
+  // const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const countryId = e.target.value;
+  //   GetState(parseInt(countryId)).then((result) => {
+  //     setStateList(result);
+  //   });
+  // };
+
+  // const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const stateId = e.target.value;
+  //   GetCity(parseInt(stateId)).then((result) => {
+  //     setCityList(result);
+  //     console.log('Selected cities:', result);    
+  //   });
+  // };
+
+  useEffect(() => {
+    GetCountries().then((result) => {
+      setCountriesList(result);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (country) {
+      GetState((country)).then((result) => {
+        setStateList(result);
+      });
+    }
+  }, [country]);
+  
+  useEffect(() => {
+    if (currentState && country)
+      GetCity((country),(currentState)).then((result) => {
+        setCitiesList(result);
+      });
+  }, [currentState]);
+
+  useEffect(() => {
+    if (countryBill) {
+      GetState((countryBill)).then((result) => {
+        setStateListBill(result);
+      });
+    }
+  }, [countryBill]);
+
+  useEffect(() => {
+    if (currentStateBill && countryBill)
+      GetCity((countryBill),(currentStateBill)).then((result) => {
+        setCitiesListBill(result);
+      });
+  }, [currentStateBill]);
+  
+  // useEffect(() => {
+  //   if (currentState && country)
+  //     GetCity((country),(currentState)).then((result) => {
+  //       setCitiesList(result);
+  //     });
+  // }, [currentState]);
+
+
   useEffect(() => {
     if (fetched.current) return; // Avoid re-fetching
     fetched.current = true;
@@ -30,7 +111,7 @@ export default function BuyNow() {
     const fetchCountry = async () => {
       try {
         const userCountry = await getUserLocation();
-        setCountry(userCountry);
+        setLocation(userCountry);
       } catch (error) {
         console.error("Error fetching country:", error);
       }
@@ -78,16 +159,55 @@ export default function BuyNow() {
       color: product.color,
     }));
 
+    if(formDataObj.country === ""){
+      toast.error("Please select country", { id: toastId });
+      return;
+    }
+
+    let selectedCountry = countriesList.find((c) => c.id == formDataObj.country);
+
+    if(formDataObj.province === ""){
+      toast.error("Please select state", { id: toastId });
+      return;
+    }
+
+    let selectedState = stateList.find((s) => s.id == formDataObj.province);
+    
+    if(formDataObj.city === ""){
+      toast.error("Please select city", { id: toastId });
+      return;
+    }
+    
+    let selectedCity = citiesList.find((ct) => ct.id == formDataObj.city);
+
+    if(formDataObj.country_bill){
+      let selectedCountryBill = countriesList.find((c) => c.id == formDataObj.country_bill);
+      formDataObj.country_bill = selectedCountryBill.name;
+    }
+    
+    if(formDataObj.province_bill){
+      let selectedStateBill = stateListBill.find((s) => s.id == formDataObj.province_bill);
+      formDataObj.province_bill = selectedStateBill.name;
+    }
+    
+    if(formDataObj.city_bill){
+      let selectedCityBill = citiesListBill.find((ct) => ct.id == formDataObj.city_bill);
+      formDataObj.city_bill = selectedCityBill.name;
+    }
+
+    formDataObj.country = selectedCountry.name;
+    formDataObj.province = selectedState.name;
+    formDataObj.city = selectedCity.name;
+
     // Prepare the full data
     const requestData = {
-      ...formDataObj,  
+      ...formDataObj, 
       products: productsData,  
       order_subtotal: subTotal,
       order_total: subTotal + shippingTotal,
       delivery_charges: shippingTotal,
     };
-
-    // console.log("Request data with products: ", requestData);
+    // console.log('formData:', formDataObj);
 
     // Send request to API
     try {
@@ -153,32 +273,41 @@ export default function BuyNow() {
             <h2 className="text-xl font-bold mt-6">Delivery</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="city" className="block font-medium">City</label>
-                <select id="city" name="city" className="w-full p-2 border rounded-lg">
-                  {/* Add cities of Pakistan */}
-                  <option value="">Select city</option>
-                  {cities.map((city:string, index:number)=>(
-                    <option key={index} value={city}>{city}</option>
+                <label htmlFor="country" className="block font-medium">Country/Region</label>
+                <select id="country" name="country" className="w-full p-2 border rounded-lg" 
+                  onChange={(e) => setCountry(Number(e.target.value))}
+                  value={country}
+                >
+                  {/* Add countries */}
+                  <option value="">Select country</option>
+                  {countriesList.map((item)=>(
+                    <option key={item.id} value={item.id}>{item.name}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label htmlFor="province" className="block font-medium">Province</label>
-                <select id="province" name="province" className="w-full p-2 border rounded-lg">
+                <select id="province" name="province" className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setcurrentState(Number(e.target.value))}
+                  value={currentState}
+                >
                   {/* Add provinces of Pakistan */}
                   <option value="">Select province</option>
-                  {provinces.map((province:string, index:number)=>(
-                    <option key={index} value={province}>{province}</option>
+                  {stateList.map((item)=>(
+                    <option key={item.id} value={item.id}>{item.name}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label htmlFor="country" className="block font-medium">Country/Region</label>
-                <select id="country" name="country" className="w-full p-2 border rounded-lg">
-                  {/* Add countries */}
-                  {/* <option value="">Select country</option> */}
-                  {countries.map((country:string, index:number)=>(
-                    <option key={index} value={country}>{country}</option>
+                <label htmlFor="city" className="block font-medium">City</label>
+                <select id="city" name="city" className="w-full p-2 border rounded-lg"
+                  onChange={(e) => setCity(Number(e.target.value))}
+                  value={city}
+                >
+                  {/* Add cities of Pakistan */}
+                  <option value="">Select city</option>
+                  {citiesList.map((item)=>(
+                    <option key={item.id} value={item.id}>{item.name}</option>
                   ))}
                 </select>
               </div>
@@ -261,6 +390,45 @@ export default function BuyNow() {
                   {/* Reuse delivery fields */}
                   <>
                     <div>
+                      <label htmlFor="country" className="block font-medium">Country/Region</label>
+                      <select id="country" name="country_bill" className="w-full p-2 border rounded-lg" 
+                        onChange={(e) => setCountryBill(Number(e.target.value))}
+                        value={countryBill}
+                      >
+                        {/* Add countries */}
+                        <option value="">Select country</option>
+                        {countriesList.map((item)=>(
+                          <option key={item.id} value={item.id}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="province" className="block font-medium">Province</label>
+                      <select id="province" name="province_bill" className="w-full p-2 border rounded-lg"
+                        onChange={(e) => setcurrentStateBill(Number(e.target.value))}
+                        value={currentStateBill}
+                      >
+                        {/* Add provinces of Pakistan */}
+                        <option value="">Select province</option>
+                        {stateListBill.map((item)=>(
+                          <option key={item.id} value={item.id}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="City" className="block font-medium">City</label>
+                      <select id="City" name="city_bill" className="w-full p-2 border rounded-lg"
+                        onChange={(e) => setCityBill(Number(e.target.value))}
+                        value={cityBill}
+                      >
+                        {/* Add cities of Pakistan */}
+                        <option value="">Select city</option>
+                        {citiesListBill.map((item)=>(
+                          <option key={item.id} value={item.id}>{item.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* <div>
                       <label htmlFor={`City`} className="block font-medium">
                         City
                       </label>
@@ -310,7 +478,7 @@ export default function BuyNow() {
                           </option>
                         ))}
                       </select>
-                    </div>
+                    </div> */}
                     <div>
                       <label htmlFor={`FirstName`} className="block font-medium">
                         First Name
@@ -367,7 +535,7 @@ export default function BuyNow() {
                         id={`Phone`}
                         name="phone_no_bill"
                         type="tel"
-                        pattern="\+\d{1,3}-\d{3}-\d{7}" 
+                        // pattern="\+\d{1,3}-\d{3}-\d{7}" 
                         className="w-full p-2 border rounded-lg"
                         required
                       />
@@ -414,9 +582,9 @@ export default function BuyNow() {
                     ))}
                 </div>
                 <div className="mt-4">
-                <p>Subtotal: {getCurrencySymbol(country)}{subTotal.toFixed(2)}</p>
-                <p>Shipping: {getCurrencySymbol(country)}{shippingTotal.toFixed(2)}</p>
-                <p>Total: {getCurrencySymbol(country)}{(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
+                <p>Subtotal: {getCurrencySymbol(locatiom)}{subTotal.toFixed(2)}</p>
+                <p>Shipping: {getCurrencySymbol(locatiom)}{shippingTotal.toFixed(2)}</p>
+                <p>Total: {getCurrencySymbol(locatiom)}{(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
                 </div>
             </div>
       </div>

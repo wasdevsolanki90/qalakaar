@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { updateAuthUser, fetchAuthUser } from '@/app/actions';
 import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation';
+import { GetCountries, GetState, GetCity } from "react-country-state-city";
 
 // User type for state management
 type User = {
@@ -270,6 +271,13 @@ export default function Profile() {
     {"name": "Zimbabwe", "code": "ZW"} 
     ];
 
+  const [country, setCountry] = useState<number | undefined>();
+  const [currentState, setcurrentState] = useState<number>();
+  const [city, setCity] = useState<number>();
+  const [countriesList, setCountriesList] = useState<any[]>([]);
+  const [stateList, setStateList] = useState<any[]>([]);
+  const [citiesList, setCitiesList] = useState<any[]>([]);
+
   const [user, setUser] = useState<User>({
     first_name: "",
     last_name: "",
@@ -289,6 +297,7 @@ export default function Profile() {
       try {
         const authUser: any = await fetchAuthUser();
         if (authUser) {
+          console.log('authUser: ', authUser);
           setUser({
             first_name: authUser.first_name,
             last_name: authUser.last_name || "",
@@ -309,6 +318,27 @@ export default function Profile() {
     getUser();
   }, []);
 
+  useEffect(() => {
+    GetCountries().then((result) => {
+      setCountriesList(result);
+    });
+  }, []);
+  
+  useEffect(() => {
+    if (country) {
+      GetState((country)).then((result) => {
+        setStateList(result);
+      });
+    }
+  }, [country]);
+  
+  useEffect(() => {
+    if (currentState && country)
+      GetCity((country),(currentState)).then((result) => {
+        setCitiesList(result);
+      });
+  }, [currentState]);
+
   // Handle form submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -321,6 +351,46 @@ export default function Profile() {
         return;
     }
 
+    if(country) {
+      if(formData.get('country') === ""){
+        toast.error("Please select country", { id: toastId });
+        return;
+      }
+      
+      let selectedCountry = countriesList.find((c) => c.id == formData.get('country'));
+      if(selectedCountry){
+        formData.set('country', selectedCountry.name);
+      }
+    } else {
+      formData.set('country', user.country);
+    }
+
+    if(currentState) {
+      if(formData.get('province') === ""){
+        toast.error("Please select state", { id: toastId });
+        return;
+      }
+  
+      let selectedState = stateList.find((s) => s.id == formData.get('province'));
+      if(selectedState){
+        formData.set('province', selectedState.name);
+      }
+    }
+
+    if(city) {
+      if(formData.get('city') === ""){
+        toast.error("Please select city", { id: toastId });
+        return;
+      }
+  
+      let selectedCity = citiesList.find((ct) => ct.id == formData.get('city'));
+      if(selectedCity){
+        formData.set('city', selectedCity.name);
+      }
+    } else {
+      formData.set('city', user.city);
+    }
+    // console.log('form data:', formData.get('country'));
     const result = await updateAuthUser(formData);
     if (!result.success) {
       toast.error(result.message || "An error occurred.", { id: toastId });
@@ -387,30 +457,63 @@ export default function Profile() {
             />
 
             {/* City Dropdown */}
-            <select
-              name="city"
-              className="w-full border rounded p-2"
-              value={user.city}
-              onChange={(e) => setUser({ ...user, city: e.target.value })}
-            >
-              <option value="">Select city</option>
-              {cities.map((city, index) => (
-                <option key={`${city}-${index}`} value={city}>{city}</option>
-              ))}
-            </select>
-
-            {/* Country and Postal Code */}
-            <div className="flex gap-4">
-              <select
+            {/* <select
                 name="country"
-                className="w-1/2 border rounded p-2"
+                className="w-full border rounded p-2"
                 value={user.country}
                 onChange={(e) => setUser({ ...user, country: e.target.value })}
               >
                 {countries.map((item, index) => (
                   <option key={index} value={item.name}>{item.name}</option>
                 ))}
+            </select> */}
+            <div className="flex gap-4">
+              <select id="country" name="country" className="w-1/2 border rounded p-2" 
+                    onChange={(e) => setCountry(Number(e.target.value))}
+                    value={country}
+                  >
+                <option value="">Select country</option>
+                {countriesList.map((item)=>(
+                  <option key={item.id} value={item.id}>{item.name}</option>
+                ))}
               </select>
+
+              <select id="province" name="province" className="w-1/2 p-2 border rounded"
+                onChange={(e) => setcurrentState(Number(e.target.value))}
+                value={currentState}
+              >
+                {/* Add provinces of Pakistan */}
+                <option value="">Select province</option>
+                {stateList.map((item)=>(
+                  <option key={item.id} value={item.id}>{item.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Country and Postal Code */}
+            <div className="flex gap-4">
+              {/* <select
+                name="city"
+                className="w-1/2 border rounded p-2"
+                value={user.city}
+                onChange={(e) => setUser({ ...user, city: e.target.value })}
+              >
+                <option value="">Select city</option>
+                {cities.map((city, index) => (
+                  <option key={`${city}-${index}`} value={city}>{city}</option>
+                ))}
+              </select> */}
+                <select id="city" name="city" className="w-1/2 p-2 border rounded"
+                  onChange={(e) => setCity(Number(e.target.value))}
+                  value={city}
+                >
+                  {/* Add cities of Pakistan */}
+                  <option value="">Select city</option>
+                  {citiesList.map((item)=>(
+                    <option key={item.id} value={item.id}>{item.name}</option>
+                  ))}
+                </select>
+
               <Input
                 placeholder="Postal Code"
                 name="postal_code"

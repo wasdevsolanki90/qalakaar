@@ -70,13 +70,22 @@ export default function CartItem(props: {
         setProduct(data);
         if (data) {
           props.setSubTotalPrice((prevTotal: number) => {
-            if(country == 'US') {
-              return data[0].price_usd * props.quantity + prevTotal;
+            // if(country == 'US') {
+            //   return data[0].price_usd * props.quantity + prevTotal;
+            // } else if( country == 'AE') {
+            //   return data[0].price_uae * props.quantity + prevTotal;
+            // } else {
+            //   return data[0].price * props.quantity + prevTotal;
+            // }
+
+            if(country == 'PK') {
+              return data[0].price * props.quantity + prevTotal;
             } else if( country == 'AE') {
               return data[0].price_uae * props.quantity + prevTotal;
             } else {
-              return data[0].price * props.quantity + prevTotal;
+              return data[0].price_usd * props.quantity + prevTotal;
             }
+
           });
         }
       })
