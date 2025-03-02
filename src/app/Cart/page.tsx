@@ -109,7 +109,7 @@ export default function Cart() {
           <div className="flex flex-col xl:flex-row xl:justify-around xl:items-start mt-10 gap-y-4 gap-x-10">
             <div className="flex-[2_1_0%]">
               {products.map((product, index) => (
-                <CartItem 
+                <CartItem
                   key={product.product_id + index}
                   product_id={product.product_id}
                   quantity={product.quantity}
@@ -141,7 +141,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white duration-700 ease-in-out">
-                          {getCurrencySymbol(country)}{subTotal.toFixed(2)}
+                          {getCurrencySymbol(country)} {subTotal.toFixed(2)}
                         </div>
                       </div>
                     </li>
@@ -165,8 +165,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          {getCurrencySymbol(country)} 
-                          {(Number(subTotal || 0) + Number(deliveryCharges || 0)).toFixed(2)}
+                          {getCurrencySymbol(country)} {(Number(subTotal || 0) + Number(deliveryCharges || 0)).toFixed(2)}
                         </div>
                       </div>
                     </li>

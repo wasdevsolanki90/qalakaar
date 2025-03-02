@@ -122,7 +122,7 @@ if (product) {
                 <p>Size: {props.size}, Color: {props.color}, Quantity: {props.quantity}</p>
             </div>
         </div>
-        <p>{getCurrencySymbol(country)}{getPrice(product[0], country)}</p>
+        <p>{getCurrencySymbol(country)} {getPrice(product[0], country).toFixed(2)}</p>
       </div>
     )}
 }

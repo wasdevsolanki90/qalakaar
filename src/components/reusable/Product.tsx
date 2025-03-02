@@ -27,6 +27,7 @@ export default function Product({
   const fetched = useRef(false);
 
   useEffect(() => {
+
     // Avoid re-fetching
     if (fetched.current) return; 
     fetched.current = true;
@@ -86,7 +87,7 @@ export default function Product({
           className="object-cover object-center h-[400px] w-full mb-2 transition-transform duration-300 ease-in-out transform group-hover:scale-105"
         />
         <h3 className="text-lg text-white font-semibold">{productName}</h3>
-        <p className="text-lg text-white font-bold">{getCurrencySymbol(country)} {price}</p>
+        <p className="text-lg text-white font-bold">{getCurrencySymbol(country)}  {price !== null ? price.toFixed(2) : ''}</p>
       </div>
     </Link>
   );

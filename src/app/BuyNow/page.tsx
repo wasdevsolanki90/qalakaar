@@ -260,6 +260,7 @@ export default function BuyNow() {
                 placeholder="Enter your email"
                 className="w-full p-2 border rounded-lg"
                 required
+                style={{ fontFamily: 'Arial' }}
               />
             </div>
             <div>
@@ -277,6 +278,7 @@ export default function BuyNow() {
                 <select id="country" name="country" className="w-full p-2 border rounded-lg" 
                   onChange={(e) => setCountry(Number(e.target.value))}
                   value={country}
+                  style={{ fontFamily: 'Arial' }}
                 >
                   {/* Add countries */}
                   <option value="">Select country</option>
@@ -290,6 +292,7 @@ export default function BuyNow() {
                 <select id="province" name="province" className="w-full p-2 border rounded-lg"
                   onChange={(e) => setcurrentState(Number(e.target.value))}
                   value={currentState}
+                  style={{ fontFamily: 'Arial' }}
                 >
                   {/* Add provinces of Pakistan */}
                   <option value="">Select province</option>
@@ -303,6 +306,7 @@ export default function BuyNow() {
                 <select id="city" name="city" className="w-full p-2 border rounded-lg"
                   onChange={(e) => setCity(Number(e.target.value))}
                   value={city}
+                  style={{ fontFamily: 'Arial' }}
                 >
                   {/* Add cities of Pakistan */}
                   <option value="">Select city</option>
@@ -313,19 +317,19 @@ export default function BuyNow() {
               </div>
               <div>
                 <label htmlFor="firstName" className="block font-medium">First Name</label>
-                <input id="firstName" name="first_name" type="text" className="w-full p-2 border rounded-lg" required />
+                <input id="firstName" name="first_name" type="text" className="w-full p-2 border rounded-lg" style={{ fontFamily: 'Arial' }} required />
               </div>
               <div>
                 <label htmlFor="lastName" className="block font-medium">Last Name</label>
-                <input id="lastName" name="last_name" type="text" className="w-full p-2 border rounded-lg" required />
+                <input id="lastName" name="last_name" type="text" className="w-full p-2 border rounded-lg" style={{ fontFamily: 'Arial' }} required />
               </div>
               <div>
                 <label htmlFor="address" className="block font-medium">Address</label>
-                <input id="address" name="address" type="text" className="w-full p-2 border rounded-lg" required />
+                <input id="address" name="address" type="text" className="w-full p-2 border rounded-lg" style={{ fontFamily: 'Arial' }} required />
               </div>
               <div>
                 <label htmlFor="postalCode" className="block font-medium">Postal Code (Optional)</label>
-                <input id="postalCode" name="postal_code" type="text" className="w-full p-2 border rounded-lg" />
+                <input id="postalCode" name="postal_code" type="text" className="w-full p-2 border rounded-lg" style={{ fontFamily: 'Arial' }} />
               </div>
               <div>
                 <label htmlFor="phone" className="block font-medium">Phone Number</label>
@@ -337,6 +341,7 @@ export default function BuyNow() {
                     className="w-full p-2 border rounded-lg" 
                     title="Please enter a valid phone number in the format 03xx-xxxxxxx"
                     required
+                    style={{ fontFamily: 'Arial' }}
                 />
               </div>
               <div>
@@ -394,6 +399,7 @@ export default function BuyNow() {
                       <select id="country" name="country_bill" className="w-full p-2 border rounded-lg" 
                         onChange={(e) => setCountryBill(Number(e.target.value))}
                         value={countryBill}
+                        style={{ fontFamily: 'Arial' }}
                       >
                         {/* Add countries */}
                         <option value="">Select country</option>
@@ -407,6 +413,7 @@ export default function BuyNow() {
                       <select id="province" name="province_bill" className="w-full p-2 border rounded-lg"
                         onChange={(e) => setcurrentStateBill(Number(e.target.value))}
                         value={currentStateBill}
+                        style={{ fontFamily: 'Arial' }}
                       >
                         {/* Add provinces of Pakistan */}
                         <option value="">Select province</option>
@@ -420,6 +427,7 @@ export default function BuyNow() {
                       <select id="City" name="city_bill" className="w-full p-2 border rounded-lg"
                         onChange={(e) => setCityBill(Number(e.target.value))}
                         value={cityBill}
+                        style={{ fontFamily: 'Arial' }}
                       >
                         {/* Add cities of Pakistan */}
                         <option value="">Select city</option>
@@ -489,6 +497,7 @@ export default function BuyNow() {
                         type="text"
                         className="w-full p-2 border rounded-lg"
                         required
+                        style={{ fontFamily: 'Arial' }}
                       />
                     </div>
                     <div>
@@ -501,6 +510,7 @@ export default function BuyNow() {
                         type="text"
                         className="w-full p-2 border rounded-lg"
                         required
+                        style={{ fontFamily: 'Arial' }}
                       />
                     </div>
                     <div>
@@ -513,6 +523,7 @@ export default function BuyNow() {
                         type="text"
                         className="w-full p-2 border rounded-lg"
                         required
+                        style={{ fontFamily: 'Arial' }}
                       />
                     </div>
                     <div>
@@ -524,6 +535,7 @@ export default function BuyNow() {
                         name="postal_code_bill"
                         type="text"
                         className="w-full p-2 border rounded-lg"
+                        style={{ fontFamily: 'Arial' }}
                       />
                     </div>
                     <div>
@@ -538,6 +550,7 @@ export default function BuyNow() {
                         // pattern="\+\d{1,3}-\d{3}-\d{7}" 
                         className="w-full p-2 border rounded-lg"
                         required
+                        style={{ fontFamily: 'Arial' }}
                       />
                     </div>
                   </>
@@ -554,6 +567,7 @@ export default function BuyNow() {
                 name="instructions"
                 rows={3}
                 className="w-full p-2 border rounded-lg"
+                style={{ fontFamily: 'Arial' }}
               />
             </div>
 
@@ -570,21 +584,21 @@ export default function BuyNow() {
                 <div className="space-y-4">
                     {/* Example of Cart Item */}
                     {products && products.length > 0 &&
-                        products.map((product, index) => (
-                          <ProductCard 
-                            key={index}
-                            product_id={product.product_id}
-                            quantity={product.quantity}
-                            size={product.size}
-                            color={product.color}
-                            setTotalPrice={setSubTotal}
-                          />
+                      products.map((product, index) => (
+                        <ProductCard
+                          key={index}
+                          product_id={product.product_id}
+                          quantity={product.quantity}
+                          size={product.size}
+                          color={product.color}
+                          setTotalPrice={setSubTotal}
+                        />
                     ))}
                 </div>
                 <div className="mt-4">
-                <p>Subtotal: {getCurrencySymbol(locatiom)}{subTotal.toFixed(2)}</p>
-                <p>Shipping: {getCurrencySymbol(locatiom)}{shippingTotal.toFixed(2)}</p>
-                <p>Total: {getCurrencySymbol(locatiom)}{(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
+                <p>Subtotal: {getCurrencySymbol(locatiom)} {subTotal.toFixed(2)}</p>
+                <p>Shipping: {getCurrencySymbol(locatiom)} {shippingTotal.toFixed(2)}</p>
+                <p>Total: {getCurrencySymbol(locatiom)} {(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
                 </div>
             </div>
       </div>

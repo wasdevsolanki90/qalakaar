@@ -199,7 +199,7 @@ export default function CartItem(props: {
                 {product[0].type}
               </p>
               <p className="text-base font-semibold">
-                Price: {getCurrencySymbol(country)}{getPrice(product[0], country)}
+                Price: {getCurrencySymbol(country)} {getPrice(product[0], country).toFixed(2)}
               </p>
             </div>
             <Button
@@ -211,7 +211,7 @@ export default function CartItem(props: {
           </div>
           <div className="text-white w-full grid grid-cols-1 lg:grid-cols-2 items-baseline justify-between">
             <p className="text-base font-semibold">
-              Item Total: {getCurrencySymbol(country)}{getPrice(product[0], country) * newQuantity}
+              Item Total: {getCurrencySymbol(country)} {(getPrice(product[0], country) * newQuantity).toFixed(2)}
             </p>
             <div className="order-1 md:order-last">
               <div className="flex items-baseline justify-between space-y-2">

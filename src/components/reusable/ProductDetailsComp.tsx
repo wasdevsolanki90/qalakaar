@@ -24,7 +24,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0); // Index of the main image
   const [country, setCountry] = useState<string | null>(null);
   const fetched = useRef(false); 
-  const [price, setPrice] = useState<number | null>(null);
+  // const [price, setPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (fetched.current) return; // Avoid re-fetching
@@ -291,7 +291,7 @@ export default function ProductDetailsComp({ product }: { product: IProduct }) {
         {/* Price */}
         <div className="flex items-center space-x-4 font-sans">
           <p className="text-white text-4xl font-semibold">
-            {getCurrencySymbol(country)} {getPrice(product, country)}
+            {getCurrencySymbol(country)} {getPrice(product, country).toFixed(2)}
           </p>
         </div>
 
