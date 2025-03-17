@@ -374,18 +374,19 @@ export async function getChargesByCountry(country: string) {
         .from(shippingChargesTable)
         .where(eq(shippingChargesTable.country, country))
         .limit(1);
-  
-      if (!charges || charges.length === 0) {
-        return {
-          status: 404,
-          message: "Country not found",
-        };
-      }
-  
+
+    //   if (!charges || charges.length === 0) {
+    //     return {
+    //       status: 404,
+    //       message: "Country not found",
+    //     };
+    //   }
+
       return {
         status: 200,
         data: charges,
       };
+
     } catch (error) {
       console.error("Database error fetching charges:", error);
       return {
