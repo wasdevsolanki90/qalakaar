@@ -59,6 +59,7 @@ export default function Cart() {
           const getCharges = await fetchChargesByCountry(data.country_name);
           if(getCharges) {
 
+            console.log('Chargesx: ', getCharges); 
             const charge = parseInt(getCharges.data[0]['charges'], 10);
             setCharges(charge);
 
