@@ -358,10 +358,10 @@ export async function getAllShippingCharges() {
 export async function getChargesByCountry(country: string) {
 
     if( !country ) {
-        return NextResponse.json({
+        return {
+            status: 400,
             message: "Invalid country name",
-            status: 400
-        });
+        };
     }
 
     try {
