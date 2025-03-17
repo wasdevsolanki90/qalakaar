@@ -1,6 +1,17 @@
 'use server'
+
 import { passwordHasher } from '@/lib/password';
-import { getSession, login, logout, signup, getAuthUser, updateProfile } from '@/lib/serverLib';
+import { 
+    getSession, 
+    login, 
+    logout, 
+    signup, 
+    getAuthUser, 
+    updateProfile, 
+    addShippingCharges,
+    getAllShippingCharges, 
+    getChargesByCountry,
+} from '@/lib/serverLib';
  
 export async function signupUser(formData: FormData) {
 
@@ -48,21 +59,6 @@ export async function loginUser(formData: FormData) {
     }
 }
 
-// export async function fetchOrders() {
-//     try {
-//         const res = await orders();
-//         if (!res?.ok) {
-//             return { success: false, message: "Failed to fetch orders" };
-//         }
-
-//         const userOrder = await res.json(); 
-//         return { success: true, userOrder };
-//     } catch (error) {
-//         console.error("Error in fetchOrders:", error);
-//         return { success: false, message: "An error occurred" };
-//     }
-// }
-
 export async function logoutUser() {
     await logout()
 }
@@ -89,4 +85,51 @@ export async function fetchAuthUser() {
 
 export async function createOrder(formData: FormData) {
     
+}
+
+export async function addShippingCharge(formData: FormData) {
+
+    const res = await addShippingCharges(formData)
+    const result = await res?.json()
+
+    if (res?.ok ) {
+        const getAllCharges = await getAllShippingCharges();
+        return {
+            success: true, 
+            message: result.message,  
+            data: getAllCharges,  
+        }
+
+    } else {
+        return { 
+            success: false, 
+            message: result.error 
+        }
+    }
+}
+
+export async function fetchAllShippingCharges() {
+    const result = await getAllShippingCharges();
+    return result;
+}
+
+
+export async function fetchChargesByCountry(country: string) {
+
+    const res = await getChargesByCountry(country)
+    const result = await res?.json()
+
+    if (res?.ok ) {
+
+        return {
+            success: true, 
+            data: result.data,
+        }
+
+    } else {
+        return { 
+            success: false, 
+            message: result.error 
+        }
+    }
 }

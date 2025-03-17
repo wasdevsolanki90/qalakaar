@@ -297,7 +297,7 @@ export default function Profile() {
       try {
         const authUser: any = await fetchAuthUser();
         if (authUser) {
-          console.log('authUser: ', authUser);
+          // console.log('authUser: ', authUser);
           setUser({
             first_name: authUser.first_name,
             last_name: authUser.last_name || "",

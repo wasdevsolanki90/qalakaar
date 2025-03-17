@@ -2,7 +2,7 @@
 // import { sql } from "@vercel/postgres";
 // import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
-import { pgTable, varchar, serial, integer, date, boolean, text } from "drizzle-orm/pg-core";
+import { pgTable, varchar, serial, integer, date, boolean, text, decimal } from "drizzle-orm/pg-core";
 import { Pool } from "@neondatabase/serverless";
 
 // CREATE TABLE users (
@@ -45,6 +45,13 @@ export const userTable = pgTable("users", {
     length: 15,
   })
 });
+
+export const shippingChargesTable = pgTable("shipping_charges", {
+  id: serial("id").primaryKey(),
+  country: varchar("country").notNull(),
+  charges: varchar("charges").notNull(),
+  status: boolean("status").default(true),
+})
 
 // CREATE TABLE cart (
 //   id SERIAL,

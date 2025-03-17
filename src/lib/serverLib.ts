@@ -2,8 +2,8 @@ import { SignJWT, jwtVerify } from "jose"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { UserT } from "@/lib/types"
-import { eq, and, sql, inArray  } from "drizzle-orm";
-import { cartTable, db, userTable, orderTable, orderDetailsTable } from "@/lib/drizzle"; 
+import { eq, sql, inArray  } from "drizzle-orm";
+import { cartTable, db, userTable, orderTable, orderDetailsTable, shippingChargesTable } from "@/lib/drizzle"; 
 import { bcryptCompare } from "./password";
 import { insert } from "sanity";
 
@@ -276,3 +276,109 @@ export async function updateSession(request: NextRequest, session:string) {
     return res
 }
 
+export async function existShippingCharges(country: string) {
+    const existingCharge = await db
+        .select({
+            country: shippingChargesTable.country,
+        })
+        .from(shippingChargesTable)
+        .where(eq(shippingChargesTable.country, country))
+        .limit(1);
+
+    return existingCharge.length > 0;
+}
+
+export async function addShippingCharges(formData: FormData) {
+    try {
+
+        const country: string | undefined = formData.get("country")?.toString();
+        const charges: string | undefined = formData.get("charges")?.toString();
+
+        if (!country || !charges) {
+            throw new Error("Country and charges are required fields.");
+        }
+
+        // Check if shipping charge for this country already exists
+        const isExist = await existShippingCharges(country);
+        if (isExist) {
+            const updatedCharge = await db
+            .update(shippingChargesTable)
+            .set({
+                charges,
+            })
+            .where(eq(shippingChargesTable.country, country))
+            .returning();
+            
+            return NextResponse.json({
+                status: 200,
+                message: `Shipping charges is updated for ${country}`,
+            });
+        }
+
+        const res = await db
+        .insert(shippingChargesTable)
+        .values({
+            country: country,
+            charges: charges,
+        })
+        .returning();
+        
+        return NextResponse.json({
+            message: "Shipping charges added successful!",
+            status: 200,
+            data: res,
+        })
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error ("Shipping charge error:", error.message)
+            return NextResponse.json({ 
+                error: error.message },
+                { status: 409 }
+            );
+        }
+    }
+}
+
+export async function getAllShippingCharges() {
+
+    const shippingCharges = await db
+        .select({
+            id: shippingChargesTable.id,
+            country: shippingChargesTable.country,
+            charges: shippingChargesTable.charges,
+            status: shippingChargesTable.status,
+        })
+        .from(shippingChargesTable)
+        .orderBy(shippingChargesTable.id);
+
+    return shippingCharges.length > 0 ? shippingCharges : null;
+}
+
+export async function getChargesByCountry(country: string) {
+
+    try {
+        const charges = await db
+            .select({
+                country: shippingChargesTable.country,
+                charges: shippingChargesTable.charges,
+            })
+            .from(shippingChargesTable)
+            .where(eq(shippingChargesTable.country, country))
+            .limit(1);
+    
+        return NextResponse.json({
+            status: 200,
+            data: charges,
+        });
+
+    } catch {
+
+        return NextResponse.json({
+            status: 404,
+            message: "Country not found",
+        });
+
+    }
+
+}

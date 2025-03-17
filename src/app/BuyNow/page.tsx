@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from "@/components/context/CartContext";
 import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 import { GetCountries, GetState, GetCity } from "react-country-state-city";
+import { fetchChargesByCountry } from '@/app/actions'; 
 
 export default function BuyNow() {
   const cities:string[] = [ "Islamabad", "Ahmed Nager", "Ahmadpur East", "Ali Khan", "Alipur", "Arifwala", "Attock", "Bhera", "Bhalwal", "Bahawalnagar", "Bahawalpur", "Bhakkar", "Burewala", "Chillianwala", "Chakwal", "Chichawatni", "Chiniot", "Chishtian", "Daska", "Darya Khan", "Dera Ghazi", "Dhaular", "Dina", "Dinga", "Dipalpur", "Faisalabad", "Fateh Jhang", "Ghakhar Mandi", "Gojra", "Gujranwala", "Gujrat", "Gujar Khan", "Hafizabad", "Haroonabad", "Hasilpur", "Haveli", "Lakha", "Jalalpur", "Jattan", "Jampur", "Jaranwala", "Jhang", "Jhelum", "Kalabagh", "Karor Lal", "Kasur", "Kamalia", "Kamoke", "Khanewal", "Khanpur", "Kharian", "Khushab", "Kot Adu", "Jauharabad", "Lahore", "Lalamusa", "Layyah", "Liaquat Pur", "Lodhran", "Malakwal", "Mamoori", "Mailsi", "Mandi Bahauddin", "mian Channu", "Mianwali", "Multan", "Murree", "Muridke", "Mianwali Bangla", "Muzaffargarh", "Narowal", "Okara", "Renala Khurd", "Pakpattan", "Pattoki", "Pir Mahal", "Qaimpur", "Qila Didar", "Rabwah", "Raiwind", "Rajanpur", "Rahim Yar", "Rawalpindi", "Sadiqabad", "Safdarabad", "Sahiwal", "Sangla Hill", "Sarai Alamgir", "Sargodha", "Shakargarh", "Sheikhupura", "Sialkot", "Sohawa", "Soianwala", "Siranwali", "Talagang", "Taxila", "Toba Tek", "Vehari", "Wah Cantonment", "Wazirabad", "Badin", "Bhirkan", "Rajo Khanani", "Chak", "Dadu", "Digri", "Diplo", "Dokri", "Ghotki", "Haala", "Hyderabad", "Islamkot", "Jacobabad", "Jamshoro", "Jungshahi", "Kandhkot", "Kandiaro", "Karachi", "Kashmore", "Keti Bandar", "Khairpur", "Kotri", "Larkana", "Matiari", "Mehar", "Mirpur Khas", "Mithani", "Mithi", "Mehrabpur", "Moro", "Nagarparkar", "Naudero", "Naushahro Feroze", "Naushara", "Nawabshah", "Nazimabad", "Qambar", "Qasimabad", "Ranipur", "Ratodero", "Rohri", "Sakrand", "Sanghar", "Shahbandar", "Shahdadkot", "Shahdadpur", "Shahpur Chakar", "Shikarpaur", "Sukkur", "Tangwani", "Tando Adam", "Tando Allahyar", "Tando Muhammad", "Thatta", "Umerkot", "Warah", "Abbottabad", "Adezai", "Alpuri", "Akora Khattak", "Ayubia", "Banda Daud", "Bannu", "Batkhela", "Battagram", "Birote", "Chakdara", "Charsadda", "Chitral", "Daggar", "Dargai", "Darya Khan", "dera Ismail", "Doaba", "Dir", "Drosh", "Hangu", "Haripur", "Karak", "Kohat", "Kulachi", "Lakki Marwat", "Latamber", "Madyan", "Mansehra", "Mardan", "Mastuj", "Mingora", "Nowshera", "Paharpur", "Pabbi", "Peshawar", "Saidu Sharif", "Shorkot", "Shewa Adda", "Swabi", "Swat", "Tangi", "Tank", "Thall", "Timergara", "Tordher", "Awaran", "Barkhan", "Chagai", "Dera Bugti", "Gwadar", "Harnai", "Jafarabad", "Jhal Magsi", "Kacchi", "Kalat", "Kech", "Kharan", "Khuzdar", "Killa Abdullah", "Killa Saifullah", "Kohlu", "Lasbela", "Lehri", "Loralai", "Mastung", "Musakhel", "Nasirabad", "Nushki", "Panjgur", "Pishin valley", "Quetta", "Sherani", "Sibi", "Sohbatpur", "Washuk", "Zhob", "Ziarat" ]
@@ -39,6 +40,8 @@ export default function BuyNow() {
   const [stateListBill, setStateListBill] = useState<any[]>([]);
   const [citiesListBill, setCitiesListBill] = useState<any[]>([]);
 
+  const [charges, setCharges] = useState<number>(0);
+  
   // useEffect(() => {
   //   GetCountries().then((result) => {
   //       setCountriesList(result);
@@ -112,6 +115,20 @@ export default function BuyNow() {
       try {
         const userCountry = await getUserLocation();
         setLocation(userCountry);
+
+        const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+        const data = await res.json();
+
+        if(data) {
+          const getCharges = await fetchChargesByCountry(data.country_name);
+          if(getCharges) {
+
+            const charge = parseInt(getCharges.data[0]['charges'], 10);
+            setCharges(charge);
+
+          }
+        }
+
       } catch (error) {
         console.error("Error fetching country:", error);
       }
@@ -204,10 +221,9 @@ export default function BuyNow() {
       ...formDataObj, 
       products: productsData,  
       order_subtotal: subTotal,
-      order_total: subTotal + shippingTotal,
-      delivery_charges: shippingTotal,
+      order_total: subTotal + charges,
+      delivery_charges: charges,
     };
-    // console.log('formData:', formDataObj);
 
     // Send request to API
     try {
@@ -223,7 +239,6 @@ export default function BuyNow() {
 
       if (response.ok) {
         toast.success("Order placed successfully", { id: toastId });
-        // console.log(data);
         setCartCount(0);
         router.push('/');
       } else {
@@ -234,6 +249,7 @@ export default function BuyNow() {
       toast.error("An error occurred", { id: toastId });
       console.error("Checkout error:", error);
     }
+    
   };
 
   return (
@@ -597,8 +613,8 @@ export default function BuyNow() {
                 </div>
                 <div className="mt-4">
                 <p>Subtotal: {getCurrencySymbol(locatiom)} {subTotal.toFixed(2)}</p>
-                <p>Shipping: {getCurrencySymbol(locatiom)} {shippingTotal.toFixed(2)}</p>
-                <p>Total: {getCurrencySymbol(locatiom)} {(Number(subTotal || 0) + Number(shippingTotal || 0)).toFixed(2)}</p>
+                <p>Shipping: {getCurrencySymbol(locatiom)} {charges.toFixed(2)}</p>
+                <p>Total: {getCurrencySymbol(locatiom)} {(Number(subTotal || 0) + Number(charges || 0)).toFixed(2)}</p>
                 </div>
             </div>
       </div>

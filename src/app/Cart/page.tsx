@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import CartItem from "@/components/reusable/CartItem";
 import { ShoppingCart } from "lucide-react";
 import toast from "react-hot-toast";
-import { Product, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
+import { Product, getUserLocation, getCurrencySymbol } from "@/lib/types";
 import { useCart } from "@/components/context/CartContext";
 import Link from "next/link";
+import { fetchChargesByCountry } from '@/app/actions'; 
+
 
 export default function Cart() {
   const { setCartCount } = useCart();
@@ -16,6 +18,8 @@ export default function Cart() {
   const [deleteCall, setDeleteCall] = useState(0);
   const [check, setCheck] = useState(false);
   const [deleteAll, setDeleteAll] = useState(false);
+  const [charges, setCharges] = useState<number>(0);
+ 
   const deliveryCharges = 0;
 
   const [country, setCountry] = useState<string | null>(null);
@@ -47,12 +51,27 @@ export default function Cart() {
       try {
         const userCountry = await getUserLocation();
         setCountry(userCountry);
+
+        const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+        const data = await res.json();
+
+        if(data) {
+          const getCharges = await fetchChargesByCountry(data.country_name);
+          if(getCharges) {
+
+            const charge = parseInt(getCharges.data[0]['charges'], 10);
+            setCharges(charge);
+
+          }
+        }
+
       } catch (error) {
         console.error("Error fetching country:", error);
       }
     };
 
     fetchCountry();
+
   }, []);
 
   const handleDeleteCall = (a: number, price: number, quantity: number) => {
@@ -153,7 +172,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                        {getCurrencySymbol(country)} {deliveryCharges}
+                        {getCurrencySymbol(country)} {charges}
                         </div>
                       </div>
                     </li>
@@ -165,7 +184,7 @@ export default function Cart() {
                           </p>
                         </div>
                         <div className="inline-flex items-center text-base font-semibold text-white dark:text-gray-900">
-                          {getCurrencySymbol(country)} {(Number(subTotal || 0) + Number(deliveryCharges || 0)).toFixed(2)}
+                          {getCurrencySymbol(country)} {(Number(subTotal || 0) + Number(charges || 0)).toFixed(2)}
                         </div>
                       </div>
                     </li>
