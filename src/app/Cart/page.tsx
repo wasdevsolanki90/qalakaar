@@ -43,38 +43,78 @@ export default function Cart() {
       });
   }, [deleteCall]);
 
-  useEffect(() => {
-    if (fetched.current) return; // Avoid re-fetching
-    fetched.current = true;
+  // useEffect(() => {
+  //   if (fetched.current) return; // Avoid re-fetching
+  //   fetched.current = true;
 
+  //   const fetchCountry = async () => {
+  //     try {
+  //       const userCountry = await getUserLocation();
+  //       setCountry(userCountry);
+
+  //       const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+  //       const data = await res.json();
+  //       console.log('Cdata: ', data);
+
+  //       if(data) {
+  //         const getCharges = await fetchChargesByCountry(data.country_name);
+  //         if(getCharges) {
+
+  //           console.log('Chargesx: ', getCharges);
+  //           const charge = parseInt(getCharges.data[0]['charges'], 10);
+  //           setCharges(charge);
+
+  //         }
+  //       }
+
+  //     } catch (error) {
+  //       console.error("Error fetching country:", error);
+  //     }
+  //   };
+
+  //   fetchCountry();
+
+  // }, []);
+
+  useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
+  
     const fetchCountry = async () => {
       try {
         const userCountry = await getUserLocation();
+        console.log("User Country:", userCountry);
         setCountry(userCountry);
-
-        const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+  
+        const res = await fetch(
+          "https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a"
+        );
         const data = await res.json();
-        console.log('Cdata: ', data);
-
-        if(data) {
-          const getCharges = await fetchChargesByCountry(data.country_name);
-          if(getCharges) {
-
-            console.log('Chargesx: ', getCharges);
-            const charge = parseInt(getCharges.data[0]['charges'], 10);
-            setCharges(charge);
-
-          }
+        console.log("Fetched Country Data:", data);
+  
+        if (!data?.country_name) {
+          console.error("Country name missing from API response");
+          return;
         }
-
+  
+        try {
+          const getCharges = await fetchChargesByCountry(data.country_name);
+          console.log("Fetched Charges:", getCharges);
+  
+          const charge = parseInt(getCharges?.data?.[0]?.charges, 10) || 0;
+          setCharges(charge);
+        } catch (fetchError) {
+          console.error("Error fetching charges:", fetchError);
+        }
+  
       } catch (error) {
         console.error("Error fetching country:", error);
       }
     };
-
+  
     fetchCountry();
-
   }, []);
+  
 
   const handleDeleteCall = (a: number, price: number, quantity: number) => {
     setDeleteCall((prevSubTotal) => prevSubTotal + a);
