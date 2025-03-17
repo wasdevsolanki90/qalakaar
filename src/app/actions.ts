@@ -115,21 +115,28 @@ export async function fetchAllShippingCharges() {
 
 
 export async function fetchChargesByCountry(country: string) {
-
-    const res = await getChargesByCountry(country)
-    const result = await res?.json()
-
-    if (res?.ok ) {
-
+    try {
+      const res = await getChargesByCountry(country);
+      const result = await res; // No need to call .json() again
+  
+      if (result?.status === 200 && result?.data && result.data.length > 0) {
         return {
-            success: true, 
-            data: result.data,
-        }
-
-    } else {
-        return { 
-            success: false, 
-            message: result.error 
-        }
+          success: true,
+          data: result.data,
+        };
+      } else {
+        console.error("Failed to fetch charges:", result);
+        return {
+          success: false,
+          message: result?.message || "Unknown error",
+        };
+      }
+    } catch (error) {
+      console.error("fetchChargesByCountry error:", error);
+      return {
+        success: false,
+        message: "Request failed",
+      };
     }
-}
+  }
+  

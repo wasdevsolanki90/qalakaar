@@ -356,29 +356,33 @@ export async function getAllShippingCharges() {
 }
 
 export async function getChargesByCountry(country: string) {
-
     try {
-        const charges = await db
-            .select({
-                country: shippingChargesTable.country,
-                charges: shippingChargesTable.charges,
-            })
-            .from(shippingChargesTable)
-            .where(eq(shippingChargesTable.country, country))
-            .limit(1);
-    
-        return NextResponse.json({
-            status: 200,
-            data: charges,
-        });
-
-    } catch {
-
-        return NextResponse.json({
-            status: 404,
-            message: "Country not found",
-        });
-
+      const charges = await db
+        .select({
+          country: shippingChargesTable.country,
+          charges: shippingChargesTable.charges,
+        })
+        .from(shippingChargesTable)
+        .where(eq(shippingChargesTable.country, country))
+        .limit(1);
+  
+      if (!charges || charges.length === 0) {
+        return {
+          status: 404,
+          message: "Country not found",
+        };
+      }
+  
+      return {
+        status: 200,
+        data: charges,
+      };
+    } catch (error) {
+      console.error("Database error fetching charges:", error);
+      return {
+        status: 500,
+        message: "Server error fetching charges",
+      };
     }
-
-}
+  }
+  

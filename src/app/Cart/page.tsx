@@ -82,31 +82,40 @@ export default function Cart() {
   
     const fetchCountry = async () => {
       try {
+        // Get user country from user location
         const userCountry = await getUserLocation();
         console.log("User Country:", userCountry);
         setCountry(userCountry);
   
-        const res = await fetch(
-          "https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a"
-        );
+        // Fetch country data from IP API if userCountry is not available
+        const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a");
         const data = await res.json();
         console.log("Fetched Country Data:", data);
   
-        if (!data?.country_name) {
+        // Validate API response
+        const countryName = data?.country_name || userCountry;
+        if (!countryName) {
           console.error("Country name missing from API response");
           return;
         }
   
+        // Fetch shipping charges by country
         try {
-          const getCharges = await fetchChargesByCountry(data.country_name);
-          console.log("Fetched Charges:", getCharges);
+          const getCharges = await fetchChargesByCountry(countryName);
+          console.log("Fetched Charges Response:", getCharges);
   
-          const charge = parseInt(getCharges?.data?.[0]?.charges, 10) || 0;
+          // Ensure valid data structure
+          if (!getCharges?.success || !getCharges?.data?.length) {
+            console.error("Invalid charges data:", getCharges);
+            return;
+          }
+  
+          // Convert charges to an integer
+          const charge = parseInt(getCharges.data[0].charges, 10) || 0;
           setCharges(charge);
         } catch (fetchError) {
           console.error("Error fetching charges:", fetchError);
         }
-  
       } catch (error) {
         console.error("Error fetching country:", error);
       }
@@ -114,6 +123,7 @@ export default function Cart() {
   
     fetchCountry();
   }, []);
+  
   
 
   const handleDeleteCall = (a: number, price: number, quantity: number) => {

@@ -107,35 +107,85 @@ export default function BuyNow() {
   // }, [currentState]);
 
 
+  // useEffect(() => {
+  //   if (fetched.current) return; // Avoid re-fetching
+  //   fetched.current = true;
+
+  //   const fetchCountry = async () => {
+  //     try {
+  //       const userCountry = await getUserLocation();
+  //       setLocation(userCountry);
+
+  //       console.log('getCoountryx: ', userCountry);
+
+  //       const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+  //       const data = await res.json();
+
+  //       if(data) {
+  //         const getCharges = await fetchChargesByCountry(data.country_name);
+  //         if(getCharges) {
+
+  //           const charge = parseInt(getCharges.data[0]['charges'], 10);
+  //           setCharges(charge);
+
+  //         }
+  //       }
+
+  //     } catch (error) {
+  //       console.error("Error fetching country:", error);
+  //     }
+  //   };
+
+  //   fetchCountry();
+  // }, []);
+
   useEffect(() => {
-    if (fetched.current) return; // Avoid re-fetching
-    fetched.current = true;
-
-    const fetchCountry = async () => {
-      try {
-        const userCountry = await getUserLocation();
-        setLocation(userCountry);
-
-        const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
-        const data = await res.json();
-
-        if(data) {
-          const getCharges = await fetchChargesByCountry(data.country_name);
-          if(getCharges) {
-
-            const charge = parseInt(getCharges.data[0]['charges'], 10);
-            setCharges(charge);
-
+      if (fetched.current) return;
+      fetched.current = true;
+    
+      const fetchCountry = async () => {
+        try {
+          // Get user country from user location
+          const userCountry = await getUserLocation();
+          console.log("User Country:", userCountry);
+          setLocation(userCountry);
+    
+          // Fetch country data from IP API if userCountry is not available
+          const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a");
+          const data = await res.json();
+          console.log("Fetched Country Data:", data);
+    
+          // Validate API response
+          const countryName = data?.country_name || userCountry;
+          if (!countryName) {
+            console.error("Country name missing from API response");
+            return;
           }
+    
+          // Fetch shipping charges by country
+          try {
+            const getCharges = await fetchChargesByCountry(countryName);
+            console.log("Fetched Charges Response:", getCharges);
+    
+            // Ensure valid data structure
+            if (!getCharges?.success || !getCharges?.data?.length) {
+              console.error("Invalid charges data:", getCharges);
+              return;
+            }
+    
+            // Convert charges to an integer
+            const charge = parseInt(getCharges.data[0].charges, 10) || 0;
+            setCharges(charge);
+          } catch (fetchError) {
+            console.error("Error fetching charges:", fetchError);
+          }
+        } catch (error) {
+          console.error("Error fetching country:", error);
         }
-
-      } catch (error) {
-        console.error("Error fetching country:", error);
-      }
-    };
-
-    fetchCountry();
-  }, []);
+      };
+    
+      fetchCountry();
+    }, []);
 
   useEffect(() => {
     setProducts([]);
