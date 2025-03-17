@@ -54,12 +54,13 @@ export default function Cart() {
 
         const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
         const data = await res.json();
+        console.log('Cdata: ', data);
 
         if(data) {
           const getCharges = await fetchChargesByCountry(data.country_name);
           if(getCharges) {
 
-            console.log('Chargesx: ', getCharges); 
+            console.log('Chargesx: ', getCharges);
             const charge = parseInt(getCharges.data[0]['charges'], 10);
             setCharges(charge);
 
