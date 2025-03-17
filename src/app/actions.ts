@@ -113,7 +113,6 @@ export async function fetchAllShippingCharges() {
     return result;
 }
 
-
 export async function fetchChargesByCountry(country: string) {
     try {
       const res = await getChargesByCountry(country);

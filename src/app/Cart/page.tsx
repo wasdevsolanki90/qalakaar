@@ -94,6 +94,7 @@ export default function Cart() {
   
         // Validate API response
         const countryName = data?.country_name || userCountry;
+        console.log('Countryx: ', countryName);
         if (!countryName) {
           console.error("Country name missing from API response");
           return;

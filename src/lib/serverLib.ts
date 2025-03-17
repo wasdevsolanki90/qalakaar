@@ -356,7 +356,16 @@ export async function getAllShippingCharges() {
 }
 
 export async function getChargesByCountry(country: string) {
+
+    if( !country ) {
+        return NextResponse.json({
+            message: "Invalid country name",
+            status: 400
+        });
+    }
+
     try {
+
       const charges = await db
         .select({
           country: shippingChargesTable.country,
