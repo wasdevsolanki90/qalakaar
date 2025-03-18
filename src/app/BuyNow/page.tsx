@@ -279,7 +279,7 @@ export default function BuyNow() {
     try {
       const response = await fetch(process.env.NEXT_PUBLIC_SITE_URL + "api/order", {
         method: "POST", 
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestData),

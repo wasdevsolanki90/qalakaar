@@ -116,7 +116,7 @@ export const POST = async (request: NextRequest) => {
   const uid = userId ? userId : body.products[0].user_id;
   const orderIdGenerator = new OrderIdGenerator();
   const orderId = orderIdGenerator.generateOrderId()
-  console.log(orderId); // e.g., "qalaakar-Xy3P2z
+  // console.log(orderId); // e.g., "qalaakar-Xy3P2z
 
   const shipping_method = "standard";
   const payment_method = "cod";
@@ -266,7 +266,8 @@ export const POST = async (request: NextRequest) => {
         const mailOptions = {
           from: `"Qalaakar Orders" <${process.env.EMAIL_USER}>`,
           // to: "sb03750@gmail.com",
-          to: "qalaakar.orders@gmail.com",
+          // to: "qalaakar.orders@gmail.com",
+          to: "wasdevdzn@gmail.com",
           subject: "Order Confirmation - Qalaakar",
           html: emailBody,
         };
