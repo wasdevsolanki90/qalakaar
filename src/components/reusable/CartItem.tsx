@@ -8,6 +8,7 @@ import { urlForImage } from "../../../sanity/lib/image";
 import toast from "react-hot-toast";
 import { IProduct, getUserLocation, getPrice, getCurrencySymbol } from "@/lib/types";
 import { useCart } from "@/components/context/CartContext";
+import { handlechangeQuantity } from '@/app/actions'; 
 
 export default function CartItem(props: {
   product_id: string;
@@ -94,18 +95,6 @@ export default function CartItem(props: {
       });
   }, [country]);
 
-  // useEffect(() => {
-  //   if (product) {
-  //     props.setSubTotalPrice((prev: number) => {
-
-  //       console.log(product[0].price * props. quantity)
-  //       return prev + product[0].price * props.quantity
-
-  //     }
-  //     );
-  //   }
-  // }, [product]);
-
   const handleDelete = async (price: number) => {
     try {
       const toastId = toast.loading("Deleting from cart...");
@@ -135,18 +124,8 @@ export default function CartItem(props: {
     }
   };
 
-  const handleQuantityCount = (action: string, price: number) => {
-    if (action === "increment") {
-      setNewQuantity(newQuantity + 1);
-      props.setSubTotalPrice((prevTotal: number) => prevTotal + price);
-    } else if (action === "decrement" && newQuantity !== 1) {
-      // console.log('price - :', price);
-      setNewQuantity(newQuantity - 1);
-      props.setSubTotalPrice((prevTotal: number) => prevTotal - price);
-    }
-  };
-
   const handleQuantityUpdate = async (id: string, price: number) => {
+    
     setUpdating(true);
     if (props.quantity === newQuantity) return;
     try {
@@ -168,7 +147,7 @@ export default function CartItem(props: {
       toast.success("Cart has been updated", {
         id: toastId,
       });
-      setCartCount(
+      setCartCount( 
         (prevCount: number) => prevCount + (newQuantity - props.quantity)
       );
     } catch (error) {
@@ -178,6 +157,114 @@ export default function CartItem(props: {
       setUpdating(false);
     }
   };
+
+  const handleQuantityCountUpdate = async (id: string, updatedQty: number, price: number) => {
+    // setUpdating(true);
+  
+    if (props.quantity === updatedQty) {
+      // setUpdating(false);
+      return;
+    }
+  
+    try {
+      // const toastId = toast.loading("Updating cart...");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/cart`, {
+        method: "PUT",
+        body: JSON.stringify({
+          product_id: id,
+          quantity: updatedQty,
+          size: props.size,
+          color: props.color,
+          action: "update",
+        }),
+      });
+  
+      if (!res.ok) throw new Error("Cannot update");
+      props.updateDeleteCall(1, price, updatedQty);
+  
+      // toast.success("Cart has been updated", {
+      //   id: toastId,
+      // });
+  
+      setCartCount(
+        (prevCount: number) => prevCount + (updatedQty - props.quantity)
+      );
+    } catch (error) {
+      console.error("Update error:", error);
+      // toast.error("Can't update!");
+    } finally {
+      // setUpdating(false);
+    }
+  };
+  
+  // const handleQuantityCount = (action: string, price: number, id: string) => {
+  //   if (action === "increment") {
+  //     setNewQuantity((prev) => {
+  //       const newQty = prev + 1;
+  //       props.setSubTotalPrice((prevTotal: number) => prevTotal + price);
+  //       handleQuantityCountUpdate(id, newQty, price);
+  //       return newQty;
+  //     });
+  //   } else if (action === "decrement" && newQuantity > 1) {
+  //     setNewQuantity((prev) => {
+  //       const newQty = prev - 1;
+  //       props.setSubTotalPrice((prevTotal: number) => prevTotal - price);
+  //       handleQuantityCountUpdate(id, newQty, price);
+  //       return newQty;
+  //     });
+  //   }
+  // };  
+
+
+  const changeQuantity = async (id: string, q: number, price: number) => {
+    
+    const result = await handlechangeQuantity(
+      id, 
+      q, 
+      price,
+      props.size,
+      props.color,
+    );
+    if (result?.success) {
+      console.log("changeQuantity", result);
+      toast.success("Quanity updated successfully.");
+    }
+  };
+
+  // const handleQuantityCount = (action: string, price: number, id: string) => {
+
+  //   if (action === "increment") {
+  //     setNewQuantity(newQuantity + 1);
+  //     props.setSubTotalPrice((prevTotal: number) => prevTotal + price);
+  //     changeQuantity(id, newQuantity, price);
+      
+      
+  //   } else if (action === "decrement" && newQuantity !== 1) {
+  //     setNewQuantity(newQuantity - 1);
+  //     props.setSubTotalPrice((prevTotal: number) => prevTotal - price);
+  //     changeQuantity(id, newQuantity, price);
+
+  //   }
+    
+  // };
+
+  const handleQuantityCount = (action: string, price: number, id: string) => {
+    let updatedQuantity = newQuantity;
+  
+    if (action === "increment") {
+      updatedQuantity = newQuantity + 1;
+      setNewQuantity(updatedQuantity);
+      props.setSubTotalPrice((prevTotal: number) => prevTotal + price);
+      changeQuantity(id, updatedQuantity, price);
+  
+    } else if (action === "decrement" && newQuantity > 1) {
+      updatedQuantity = newQuantity - 1;
+      setNewQuantity(updatedQuantity);
+      props.setSubTotalPrice((prevTotal: number) => prevTotal - price);
+      changeQuantity(id, updatedQuantity, price);
+    }
+  };
+  
 
   if (product) {
     return (
@@ -219,7 +306,7 @@ export default function CartItem(props: {
                 <div className="flex-[2_1_0%] flex items-center justify-around">
                   <Button
                     onClick={() =>
-                      handleQuantityCount("decrement", getPrice(product[0], country))
+                      handleQuantityCount("decrement", getPrice(product[0], country), product[0]._id)
                     }
                     className="bg-gray-100 rounded-full text-gray-600 text-2xl shadow-lg hover:scale-105 duration-300"
                   >
@@ -228,7 +315,7 @@ export default function CartItem(props: {
                   <p>{newQuantity}</p>
                   <Button
                     onClick={() =>
-                      handleQuantityCount("increment", getPrice(product[0], country))
+                      handleQuantityCount("increment", getPrice(product[0], country), product[0]._id)
                     }
                     className="bg-gray-100 rounded-full text-gray-600 text-2xl shadow-lg hover:scale-105 duration-300"
                   >

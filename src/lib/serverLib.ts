@@ -2,7 +2,7 @@ import { SignJWT, jwtVerify } from "jose"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { UserT } from "@/lib/types"
-import { eq, sql, inArray  } from "drizzle-orm";
+import { eq, sql, and  } from "drizzle-orm";
 import { cartTable, db, userTable, orderTable, orderDetailsTable, shippingChargesTable } from "@/lib/drizzle"; 
 import { bcryptCompare } from "./password";
 import { insert } from "sanity";
@@ -387,5 +387,44 @@ export async function getChargesByCountry(country: string) {
         message: "Server error fetching charges",
       };
     }
-  }
+}
+
+export const updateQuantity = async (
+    id: string,
+    q: number,
+    price: number,
+    size: string,
+    color: string,
+  ) => {
+    let uid = cookies().get("user_id")?.value as string;
+  
+    try {
+      const res = await db
+        .update(cartTable)
+        .set({
+          quantity: q,
+        })
+        .where(
+          and(
+            eq(cartTable.product_id, id),
+            eq(cartTable.user_id, uid),
+            eq(cartTable.size, size),
+            eq(cartTable.color, color)
+          )
+        )
+        .returning();
+  
+      return {
+        status: 200,
+        data: res,
+      };
+    } catch (error) {
+      console.error("updateQuantity error:", error);
+      return {
+        status: 500,
+        message: "Error updating quantity",
+      };
+    }
+};
+  
   

@@ -44,35 +44,35 @@ export default function Cart() {
   }, [deleteCall]);
 
   // useEffect(() => {
-  //   if (fetched.current) return; // Avoid re-fetching
-  //   fetched.current = true;
+    //   if (fetched.current) return; // Avoid re-fetching
+    //   fetched.current = true;
 
-  //   const fetchCountry = async () => {
-  //     try {
-  //       const userCountry = await getUserLocation();
-  //       setCountry(userCountry);
+    //   const fetchCountry = async () => {
+    //     try {
+    //       const userCountry = await getUserLocation();
+    //       setCountry(userCountry);
 
-  //       const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
-  //       const data = await res.json();
-  //       console.log('Cdata: ', data);
+    //       const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a",);
+    //       const data = await res.json();
+    //       console.log('Cdata: ', data);
 
-  //       if(data) {
-  //         const getCharges = await fetchChargesByCountry(data.country_name);
-  //         if(getCharges) {
+    //       if(data) {
+    //         const getCharges = await fetchChargesByCountry(data.country_name);
+    //         if(getCharges) {
 
-  //           console.log('Chargesx: ', getCharges);
-  //           const charge = parseInt(getCharges.data[0]['charges'], 10);
-  //           setCharges(charge);
+    //           console.log('Chargesx: ', getCharges);
+    //           const charge = parseInt(getCharges.data[0]['charges'], 10);
+    //           setCharges(charge);
 
-  //         }
-  //       }
+    //         }
+    //       }
 
-  //     } catch (error) {
-  //       console.error("Error fetching country:", error);
-  //     }
-  //   };
+    //     } catch (error) {
+    //       console.error("Error fetching country:", error);
+    //     }
+    //   };
 
-  //   fetchCountry();
+    //   fetchCountry();
 
   // }, []);
 
@@ -84,17 +84,17 @@ export default function Cart() {
       try {
         // Get user country from user location
         const userCountry = await getUserLocation();
-        console.log("User Country:", userCountry);
+        // console.log("User Country:", userCountry);
         setCountry(userCountry);
   
         // Fetch country data from IP API if userCountry is not available
         const res = await fetch("https://api.ipgeolocation.io/ipgeo?apiKey=6a12a8b094a94b72bd6e761d959f064a");
         const data = await res.json();
-        console.log("Fetched Country Data:", data);
+        // console.log("Fetched Country Data:", data);
   
         // Validate API response
         const countryName = data?.country_name || userCountry;
-        console.log('Countryx: ', countryName);
+        // console.log('Countryx: ', countryName);
         if (!countryName) {
           console.error("Country name missing from API response");
           return;
@@ -103,7 +103,7 @@ export default function Cart() {
         // Fetch shipping charges by country
         try {
           const getCharges = await fetchChargesByCountry(countryName);
-          console.log("Fetched Charges Response:", getCharges);
+          // console.log("Fetched Charges Response:", getCharges);
   
           // Ensure valid data structure
           if (!getCharges?.success || !getCharges?.data?.length) {
@@ -123,9 +123,7 @@ export default function Cart() {
     };
   
     fetchCountry();
-  }, []);
-  
-  
+  }, []);  
 
   const handleDeleteCall = (a: number, price: number, quantity: number) => {
     setDeleteCall((prevSubTotal) => prevSubTotal + a);

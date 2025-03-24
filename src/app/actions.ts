@@ -11,6 +11,7 @@ import {
     addShippingCharges,
     getAllShippingCharges, 
     getChargesByCountry,
+    updateQuantity,
 } from '@/lib/serverLib';
  
 export async function signupUser(formData: FormData) {
@@ -137,5 +138,38 @@ export async function fetchChargesByCountry(country: string) {
         message: "Request failed",
       };
     }
-  }
+}
+
+export async function handlechangeQuantity(
+        id: string, 
+        q: number, 
+        price: number,
+        size: string,
+        color: string,
+    ) {
+    try {
+
+        const res = await updateQuantity(id, q, price, size, color);
+        const result = await res; // No need to call .json() again
+    
+        if (result?.status === 200) {
+            return {
+              success: true,
+              data: result,
+            };
+          } else {
+            return {
+              success: false,
+              message: "Failed to update quantity",
+            };
+        }
+          
+    } catch (error) {
+      console.error("fetchChargesByCountry error:", error);
+      return {
+        success: false,
+        message: "Request failed",
+      };
+    }
+}
   

@@ -6,6 +6,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { getSession } from "@/lib/serverLib";
 
 export const GET = async (request: NextRequest) => {
+  
   const req = request.nextUrl;
   const uid = req.searchParams.get("user_id") as string;
 

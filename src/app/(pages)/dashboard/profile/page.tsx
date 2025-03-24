@@ -269,7 +269,7 @@ export default function Profile() {
     {"name": "Yemen", "code": "YE"}, 
     {"name": "Zambia", "code": "ZM"}, 
     {"name": "Zimbabwe", "code": "ZW"} 
-    ];
+  ];
 
   const [country, setCountry] = useState<number | undefined>();
   const [currentState, setcurrentState] = useState<number>();
