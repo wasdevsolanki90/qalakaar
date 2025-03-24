@@ -226,7 +226,7 @@ export default function CartItem(props: {
       props.color,
     );
     if (result?.success) {
-      console.log("changeQuantity", result);
+      // console.log("changeQuantity", result);
       toast.success("Quanity updated successfully.");
     }
   };

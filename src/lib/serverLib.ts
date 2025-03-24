@@ -414,10 +414,10 @@ export const updateQuantity = async (
         )
         .returning();
   
-      return {
-        status: 200,
-        data: res,
-      };
+        return {
+            status: 200,
+            data: res,
+        };
     } catch (error) {
       console.error("updateQuantity error:", error);
       return {
